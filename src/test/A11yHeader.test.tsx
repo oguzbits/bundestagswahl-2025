@@ -130,7 +130,7 @@ describe('App Component Accessibility Audit', () => {
     expect(swapBtn).toBeInTheDocument();
     expect(swapBtn).toHaveAttribute('title', 'Regionen tauschen');
     expect(swapBtn).toHaveAttribute('aria-label', 'Regionen tauschen');
-    expect(swapBtn.className).toContain('focus:ring-2');
-    expect(swapBtn.className).toContain('focus:ring-primary');
+    expect(swapBtn.className).toContain('focus-visible:ring-2');
+    expect(swapBtn.className).toContain('focus-visible:ring-primary');
   });
 });

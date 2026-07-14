@@ -64,8 +64,11 @@ export function Autocomplete({
             aria-haspopup="listbox"
             aria-label={label}
             className={cn(
-              'flex h-11 w-full items-center justify-between rounded-xl border border-slate-200 bg-white pl-4 pr-16 py-2.5 text-sm shadow-sm transition-all text-left relative',
-              'hover:bg-slate-50 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500',
+              'flex h-11 w-full items-center justify-between rounded-xl border bg-white pl-4 pr-16 py-2.5 text-sm shadow-sm transition-colors text-left relative',
+              open
+                ? 'border-slate-400 bg-slate-50'
+                : 'border-slate-200 hover:bg-slate-50 hover:border-slate-300',
+              'focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
               !selectedOption && 'text-slate-400',
             )}
           >
@@ -98,7 +101,7 @@ export function Autocomplete({
               type="button"
               onClick={handleClear}
               aria-label="Auswahl aufheben"
-              className="absolute right-10 top-1/2 -translate-y-1/2 rounded-full p-1 hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 z-10"
+              className="absolute right-10 top-1/2 -translate-y-1/2 rounded-full p-1 hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary z-10"
             >
               <X className="h-4 w-4" />
             </button>
