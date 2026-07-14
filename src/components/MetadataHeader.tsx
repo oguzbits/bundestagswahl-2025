@@ -1,24 +1,108 @@
-import type { GebietErgebnis } from '../domain/types';
+import { useState } from 'react';
+import type { GebietErgebnis, ParteiErgebnis } from '../domain/types';
 import { cn } from '../lib/utils';
+import { getPartyColor } from '../domain/partyColors';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 export interface MetadataHeaderProps {
   gebiet: GebietErgebnis;
   parentName?: string | null;
 }
 
-function getPartyColorClass(party: string): string {
-  const normalized = party.toUpperCase();
-  if (normalized.includes('SPD')) return 'bg-red-600 text-white';
-  if (normalized.includes('CDU') || normalized.includes('CSU')) return 'bg-zinc-800 text-white';
-  if (normalized.includes('GRÜNE') || normalized.includes('GRUENEN')) return 'bg-emerald-600 text-white';
-  if (normalized.includes('FDP')) return 'bg-yellow-400 text-black';
-  if (normalized.includes('AFD')) return 'bg-sky-600 text-white';
-  if (normalized.includes('LINKE')) return 'bg-pink-600 text-white';
-  if (normalized.includes('BSW')) return 'bg-orange-800 text-white';
-  return 'bg-slate-400 text-slate-900';
-}
+// Established major parties list as requested
+const ESTABLISHED_PARTIES = new Set([
+  'CDU',
+  'CSU',
+  'CDU/CSU',
+  'SPD',
+  'GRÜNE',
+  'GRÜNEN',
+  'BÜNDNIS 90/DIE GRÜNEN',
+  'FDP',
+  'AFD',
+  'DIE LINKE',
+  'LINKE',
+  'BSW'
+]);
 
 export function MetadatenHeader({ gebiet, parentName }: MetadataHeaderProps) {
+  const [showAll, setShowAll] = useState(false);
+
+  // Helper to format delta value compared to 2021
+  const formatDeltaInfo = (current: number, prev: number) => {
+    if (prev === 0 && current > 0) {
+      return { text: 'neu', className: 'text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded' };
+    }
+    const delta = current - prev;
+    if (delta > 0) {
+      return { text: `+${delta.toFixed(1)}%`, className: 'text-emerald-600 font-bold' };
+    }
+    if (delta < 0) {
+      return { text: `${delta.toFixed(1)}%`, className: 'text-rose-600 font-bold' };
+    }
+    return { text: '0.0%', className: 'text-slate-400' };
+  };
+
+  // Smart Filtering and Grouping Logic
+  const primaryParties: ParteiErgebnis[] = [];
+  const minorParties: ParteiErgebnis[] = [];
+
+  // Group minor and major parties
+  gebiet.parteien.forEach((p) => {
+    const isEstablished = ESTABLISHED_PARTIES.has(p.parteiKurz.toUpperCase()) || 
+                          ESTABLISHED_PARTIES.has(p.parteiLang.toUpperCase());
+    const isHighPerformer = p.zweitstimmenRelativ >= 3.0;
+
+    if (isEstablished || isHighPerformer) {
+      primaryParties.push(p);
+    } else {
+      minorParties.push(p);
+    }
+  });
+
+  // Calculate "Sonstige" aggregations
+  let sonstigeAbsolut = 0;
+  let sonstigeRelativ = 0;
+  let sonstigeAbsolut2021 = 0;
+  let sonstigeRelativ2021 = 0;
+
+  minorParties.forEach((p) => {
+    sonstigeAbsolut += p.zweitstimmenAbsolut;
+    sonstigeRelativ += p.zweitstimmenRelativ;
+    sonstigeAbsolut2021 += p.zweitstimmenAbsolut2021;
+    sonstigeRelativ2021 += p.zweitstimmenRelativ2021;
+  });
+
+  // Round relative values to 1 decimal place
+  sonstigeRelativ = Math.round(sonstigeRelativ * 10) / 10;
+  sonstigeRelativ2021 = Math.round(sonstigeRelativ2021 * 10) / 10;
+
+  // Create virtual "Sonstige" row if there are minor parties
+  const sonstigeRow: ParteiErgebnis | null = minorParties.length > 0 ? {
+    parteiKurz: 'Sonstige',
+    parteiLang: 'Sonstige Parteien unter 3.0%',
+    zweitstimmenAbsolut: sonstigeAbsolut,
+    zweitstimmenRelativ: sonstigeRelativ,
+    zweitstimmenAbsolut2021: sonstigeAbsolut2021,
+    zweitstimmenRelativ2021: sonstigeRelativ2021,
+  } : null;
+
+  // Main displayed list (primary major/established + optional Sonstige row)
+  const displayList = [...primaryParties];
+  if (sonstigeRow) {
+    displayList.push(sonstigeRow);
+  }
+
+  // Sort displayList by percentage descending, ensuring 'Sonstige' stays at the end
+  displayList.sort((a, b) => {
+    if (a.parteiKurz === 'Sonstige') return 1;
+    if (b.parteiKurz === 'Sonstige') return -1;
+    return b.zweitstimmenRelativ - a.zweitstimmenRelativ;
+  });
+
+  // Sort minorParties descending for the accordion view
+  const sortedMinorParties = [...minorParties].sort((a, b) => b.zweitstimmenRelativ - a.zweitstimmenRelativ);
+
   return (
     <div className="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden transition-all hover:shadow-lg">
       {/* Top Banner */}
@@ -29,7 +113,7 @@ export function MetadatenHeader({ gebiet, parentName }: MetadataHeaderProps) {
         gebiet.typ === 'Wahlkreis' && "bg-slate-800"
       )}>
         <div>
-          <span className="text-[10px] uppercase font-extrabold tracking-widest text-indigo-300 opacity-90">
+          <span className="text-[10px] uppercase font-extrabold tracking-widest text-indigo-300 opacity-90 font-mono">
             {gebiet.typ}-Auswahl
           </span>
           <h3 className="text-xl sm:text-2xl font-black tracking-tight mt-0.5">{gebiet.name}</h3>
@@ -39,7 +123,7 @@ export function MetadatenHeader({ gebiet, parentName }: MetadataHeaderProps) {
             </p>
           )}
         </div>
-        <span className="px-3 py-1.5 rounded-full text-xs font-bold bg-white/10 text-white border border-white/20 shrink-0">
+        <span className="px-3 py-1.5 rounded-full text-xs font-bold bg-white/10 text-white border border-white/20 shrink-0 font-mono">
           ID: {gebiet.id}
         </span>
       </div>
@@ -49,19 +133,19 @@ export function MetadatenHeader({ gebiet, parentName }: MetadataHeaderProps) {
         <div className="grid grid-cols-3 gap-3 text-center">
           <div className="bg-slate-50 rounded-xl p-3 border border-slate-100 flex flex-col justify-center">
             <div className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Wahlberechtigte</div>
-            <div className="text-sm sm:text-base font-extrabold text-slate-800 mt-1">
+            <div className="text-sm sm:text-base font-extrabold text-slate-800 mt-1 font-mono">
               {gebiet.wahlberechtigte.toLocaleString('de-DE')}
             </div>
           </div>
           <div className="bg-slate-50 rounded-xl p-3 border border-slate-100 flex flex-col justify-center">
             <div className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Wähler</div>
-            <div className="text-sm sm:text-base font-extrabold text-slate-800 mt-1">
+            <div className="text-sm sm:text-base font-extrabold text-slate-800 mt-1 font-mono">
               {gebiet.waehler.toLocaleString('de-DE')}
             </div>
           </div>
           <div className="bg-indigo-50/50 rounded-xl p-3 border border-indigo-100 flex flex-col justify-center">
             <div className="text-[10px] text-indigo-600 font-bold uppercase tracking-wider">Wahlbeteiligung</div>
-            <div className="text-base sm:text-lg font-black text-indigo-700 mt-0.5">
+            <div className="text-base sm:text-lg font-black text-indigo-700 mt-0.5 font-mono">
               {gebiet.wahlbeteiligung}%
             </div>
           </div>
@@ -71,35 +155,103 @@ export function MetadatenHeader({ gebiet, parentName }: MetadataHeaderProps) {
       {/* Second Votes Party Results */}
       <div className="px-6 pb-6">
         <div>
-          <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4 flex justify-between">
-            <span>Zweitstimmen (Stärkste Parteien)</span>
-            <span>Gültig: {gebiet.gueltigeZweitstimmen.toLocaleString('de-DE')}</span>
+          <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4 flex justify-between border-b border-slate-100 pb-2">
+            <span>Zweitstimmen</span>
+            <span className="font-mono">Gültig: {gebiet.gueltigeZweitstimmen.toLocaleString('de-DE')}</span>
           </h4>
 
-          <div className="space-y-3.5">
-            {gebiet.parteien.slice(0, 5).map((p) => (
-              <div key={p.parteiKurz} className="space-y-1">
-                <div className="flex justify-between items-center text-xs sm:text-sm font-semibold">
-                  <span className="flex items-center space-x-2 truncate mr-4">
-                    <span className={cn("w-2.5 h-2.5 rounded-full shrink-0", getPartyColorClass(p.parteiKurz).split(' ')[0])}></span>
-                    <span className="font-bold text-slate-800">{p.parteiKurz}</span>
-                    <span className="text-xs text-slate-400 font-normal truncate hidden sm:inline" title={p.parteiLang}>
-                      {p.parteiLang}
+          {/* Clean Main List */}
+          <div className="space-y-3">
+            {displayList.map((p) => {
+              const deltaInfo = formatDeltaInfo(p.zweitstimmenRelativ, p.zweitstimmenRelativ2021);
+              const partyColor = getPartyColor(p.parteiKurz);
+              
+              return (
+                <div key={p.parteiKurz} className="group p-2.5 rounded-xl hover:bg-slate-50 transition-all border border-transparent hover:border-slate-100">
+                  <div className="flex justify-between items-center text-xs sm:text-sm font-semibold">
+                    <span className="flex items-center space-x-2 truncate mr-4">
+                      <span 
+                        className="w-3 h-3 rounded-full shrink-0 border border-black/10 shadow-sm"
+                        style={{ backgroundColor: partyColor }}
+                      />
+                      <span className="font-bold text-slate-800 text-sm">{p.parteiKurz}</span>
+                      <span className="text-xs text-slate-400 font-normal truncate hidden sm:inline" title={p.parteiLang}>
+                        {p.parteiLang}
+                      </span>
                     </span>
-                  </span>
-                  <span className="text-slate-800 shrink-0 font-bold">
-                    {p.zweitstimmenRelativ}% <span className="text-[10px] text-slate-400 font-normal">({p.zweitstimmenAbsolut.toLocaleString('de-DE')})</span>
-                  </span>
+                    <div className="flex items-center space-x-2 shrink-0">
+                      <span className="text-slate-900 font-black text-sm font-mono">
+                        {p.zweitstimmenRelativ.toFixed(1)}%
+                      </span>
+                      <span className={cn("text-xs font-semibold font-mono", deltaInfo.className)}>
+                        ({deltaInfo.text})
+                      </span>
+                      <span className="text-[11px] text-slate-500 font-normal font-mono">
+                        {p.zweitstimmenAbsolut.toLocaleString('de-DE')}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="w-full bg-slate-100 rounded-full h-1.5 mt-2 overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all duration-500"
+                      style={{ 
+                        width: `${p.zweitstimmenRelativ}%`,
+                        backgroundColor: partyColor
+                      }}
+                    />
+                  </div>
                 </div>
-                <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
-                  <div
-                    className={cn("h-full rounded-full transition-all duration-500", getPartyColorClass(p.parteiKurz).split(' ')[0])}
-                    style={{ width: `${p.zweitstimmenRelativ}%` }}
-                  />
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
+
+          {/* Toggle Accordion for micro-parties */}
+          {sortedMinorParties.length > 0 && (
+            <div className="mt-4 border-t border-slate-100 pt-3">
+              <button
+                onClick={() => setShowAll(!showAll)}
+                className="w-full py-2 px-3 flex items-center justify-between text-xs font-semibold text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-xl transition-all border border-slate-200 shadow-sm"
+              >
+                <span>{showAll ? 'Weniger anzeigen' : 'Alle Parteien anzeigen'}</span>
+                {showAll ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              </button>
+
+              {showAll && (
+                <div className="mt-3 space-y-2.5 max-h-60 overflow-y-auto pr-1 animate-in fade-in slide-in-from-top-1 duration-200">
+                  {sortedMinorParties.map((p) => {
+                    const deltaInfo = formatDeltaInfo(p.zweitstimmenRelativ, p.zweitstimmenRelativ2021);
+                    const partyColor = getPartyColor(p.parteiKurz);
+
+                    return (
+                      <div key={p.parteiKurz} className="flex justify-between items-center text-xs font-medium py-1 px-1.5 hover:bg-slate-50 rounded-lg">
+                        <span className="flex items-center space-x-2 truncate mr-4">
+                          <span 
+                            className="w-2.5 h-2.5 rounded-full shrink-0 border border-black/10 shadow-sm"
+                            style={{ backgroundColor: partyColor }}
+                          />
+                          <span className="font-bold text-slate-700">{p.parteiKurz}</span>
+                          <span className="text-[10px] text-slate-400 font-normal truncate hidden sm:inline" title={p.parteiLang}>
+                            {p.parteiLang}
+                          </span>
+                        </span>
+                        <div className="flex items-center space-x-1.5 shrink-0">
+                          <span className="text-slate-800 font-bold font-mono">
+                            {p.zweitstimmenRelativ.toFixed(1)}%
+                          </span>
+                          <span className={cn("text-[10px] font-mono", deltaInfo.className)}>
+                            ({deltaInfo.text})
+                          </span>
+                          <span className="text-[10px] text-slate-400 font-mono">
+                            {p.zweitstimmenAbsolut.toLocaleString('de-DE')}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>

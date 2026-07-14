@@ -67,15 +67,6 @@ export default function App() {
                 </div>
                 {(gebiet1Id || gebiet2Id) && (
                   <div className="flex items-center gap-2">
-                    {gebiet1Id && gebiet2Id && (
-                      <button
-                        onClick={swapPositions}
-                        title="Regionen tauschen"
-                        className="px-4 py-2 text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 rounded-xl transition-all border border-slate-200 flex items-center gap-1.5"
-                      >
-                        <ArrowLeftRight className="h-3.5 w-3.5" /> Spalten tauschen
-                      </button>
-                    )}
                     <button
                       onClick={clearSelection}
                       className="px-4 py-2 text-xs font-bold bg-red-50 text-red-700 hover:bg-red-100 rounded-xl transition-all border border-red-100 flex items-center gap-1.5"
@@ -86,10 +77,10 @@ export default function App() {
                 )}
               </div>
 
-              {/* 2-Column Autocomplete Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative">
+              {/* 2-Column Autocomplete Grid with swap button elegantly positioned in between */}
+              <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-4 items-end relative">
                 {/* Column 1 Autocomplete */}
-                <div className="space-y-4">
+                <div className="w-full">
                   <Autocomplete
                     options={gebiet2Id ? searchOptions.filter((opt) => opt.id !== gebiet2Id) : searchOptions}
                     selectedId={gebiet1Id}
@@ -99,8 +90,23 @@ export default function App() {
                   />
                 </div>
 
+                {/* Elegant Swap Button in between Autocompletes */}
+                <div className="flex items-center justify-center h-11 pb-0.5">
+                  {gebiet1Id && gebiet2Id ? (
+                    <button
+                      onClick={swapPositions}
+                      title="Regionen tauschen"
+                      className="p-2.5 text-slate-600 hover:text-indigo-600 bg-slate-100 hover:bg-indigo-50 border border-slate-200 hover:border-indigo-100 rounded-xl transition-all shadow-sm"
+                    >
+                      <ArrowLeftRight className="h-4 w-4" />
+                    </button>
+                  ) : (
+                    <div className="w-9 h-9" /> // spacer
+                  )}
+                </div>
+
                 {/* Column 2 Autocomplete (Only if gebiet1 is selected) */}
-                <div className="space-y-4">
+                <div className="w-full">
                   {gebiet1Id ? (
                     <Autocomplete
                       options={searchOptions.filter((opt) => opt.id !== gebiet1Id)}
@@ -110,9 +116,9 @@ export default function App() {
                       label="Vergleichsregion (Optional)"
                     />
                   ) : (
-                    <div className="h-full flex items-end">
-                      <div className="text-sm text-slate-400 italic bg-slate-50 border border-dashed border-slate-200 rounded-xl p-4 w-full">
-                        Bitte wählen Sie zuerst eine primäre Region aus, um den Vergleich zu aktivieren.
+                    <div className="h-11 flex items-center">
+                      <div className="text-xs text-slate-400 italic bg-slate-50 border border-dashed border-slate-200 rounded-xl px-4 py-2.5 w-full truncate">
+                        Bitte wählen Sie zuerst eine primäre Region aus.
                       </div>
                     </div>
                   )}
@@ -134,10 +140,6 @@ export default function App() {
                           : null
                       }
                     />
-                    <ElectionChart
-                      data={selectedGebiet1}
-                      title={`Wahlergebnis: ${selectedGebiet1.name}`}
-                    />
                   </div>
                 ) : selectedGebiet1 && selectedGebiet2 ? (
                   /* CASE 2: Both gebiet1 and gebiet2 are selected */
@@ -153,10 +155,6 @@ export default function App() {
                               : null
                           }
                         />
-                        <ElectionChart
-                          data={selectedGebiet1}
-                          title={`Wahlergebnis: ${selectedGebiet1.name}`}
-                        />
                       </div>
 
                       {/* Column 2: Comparison Region */}
@@ -169,14 +167,10 @@ export default function App() {
                               : null
                           }
                         />
-                        <ElectionChart
-                          data={selectedGebiet2}
-                          title={`Wahlergebnis: ${selectedGebiet2.name}`}
-                        />
                       </div>
                     </div>
 
-                    {/* Combined comparison card */}
+                    {/* Combined comparison chart at the bottom */}
                     <div className="border-t border-slate-200 pt-8">
                       <ElectionChart
                         data={selectedGebiet1}
