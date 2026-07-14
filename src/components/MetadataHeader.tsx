@@ -112,16 +112,16 @@ export function MetadatenHeader({ gebiet, parentName }: MetadataHeaderProps) {
         gebiet.typ === 'Land' && "bg-indigo-900",
         gebiet.typ === 'Wahlkreis' && "bg-slate-800"
       )}>
-        <div>
+        <div className="flex flex-col justify-center min-h-[76px]">
           <span className="text-[10px] uppercase font-extrabold tracking-widest text-indigo-300 opacity-90 font-mono">
             {gebiet.typ}-Auswahl
           </span>
-          <h3 className="text-xl sm:text-2xl font-black tracking-tight mt-0.5">{gebiet.name}</h3>
-          {parentName && (
-            <p className="text-xs text-slate-300 mt-0.5 font-medium">
-              Bundesland: {parentName}
-            </p>
-          )}
+          <h3 className="text-xl sm:text-2xl font-black tracking-tight mt-0.5 truncate max-w-[240px] sm:max-w-xs md:max-w-sm" title={gebiet.name}>
+            {gebiet.name}
+          </h3>
+          <p className="text-xs text-slate-300 mt-0.5 font-medium min-h-[16px]">
+            {parentName ? `Bundesland: ${parentName}` : '\u00A0'}
+          </p>
         </div>
         <span className="px-3 py-1.5 rounded-full text-xs font-bold bg-white/10 text-white border border-white/20 shrink-0 font-mono">
           ID: {gebiet.id}
@@ -221,14 +221,19 @@ export function MetadatenHeader({ gebiet, parentName }: MetadataHeaderProps) {
             <div className="mt-4 border-t border-slate-100 pt-3">
               <button
                 onClick={() => setShowAll(!showAll)}
-                className="w-full py-2 px-3 flex items-center justify-between text-xs font-semibold text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-xl transition-all border border-slate-200 shadow-sm"
+                aria-expanded={showAll}
+                aria-controls={`minor-parties-${gebiet.id}`}
+                className="w-full py-2 px-3 flex items-center justify-between text-xs font-semibold text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-xl transition-all border border-slate-200 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
               >
                 <span>{showAll ? 'Weniger anzeigen' : 'Alle Parteien anzeigen'}</span>
                 {showAll ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
               </button>
 
               {showAll && (
-                <div className="mt-3 space-y-2.5 max-h-60 overflow-y-auto pr-1 animate-in fade-in slide-in-from-top-1 duration-200">
+                <div 
+                  id={`minor-parties-${gebiet.id}`}
+                  className="mt-3 space-y-2.5 max-h-60 overflow-y-auto pr-1 animate-in fade-in slide-in-from-top-1 duration-200"
+                >
                   {sortedMinorParties.map((p) => {
                     const deltaInfo = formatDeltaInfo(p.zweitstimmenRelativ, p.zweitstimmenRelativ2021);
                     const partyColor = getPartyColor(p.parteiKurz);

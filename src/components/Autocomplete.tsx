@@ -97,7 +97,7 @@ export function Autocomplete({
                   }
                 }}
                 aria-label="Auswahl aufheben"
-                className="rounded-full p-1 hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                className="rounded-full p-1 hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
               >
                 <X className="h-4 w-4" />
               </span>
