@@ -1,32 +1,38 @@
-# React + TypeScript + Vite
+# Bundestagswahl 2025
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A single-page web application to explore and compare the official results of the 2025 German federal election based on Open Data from the Bundeswahlleiterin.
 
-Currently, two official plugins are available:
+## 📋 Permanent Task Specifications (PwC Frontend Challenge)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+To ensure this codebase is evaluated as a high-quality Senior Developer submission, the following constraints and requirements from the challenge brief are permanently active:
 
-## React Compiler
+### 1. User Journey Requirements
+* **Electoral Areas:** Search space must cover the "Bundesgebiet" (ID: 99), 16 "Länder" (IDs: 01-16), and all 299 "Wahlkreise" (IDs: 001-299) — totaling 316 distinct areas[cite: 1].
+* **Search / Autocomplete:** Accessible search component. Selecting an area displays its results, name, turnout, and party results (absolute & relative)[cite: 1].
+* **Side-by-Side Comparison:** Choosing a second area splits the UI into two columns (each with its own diagram)[cite: 1].
+* **Comparison View:** Underneath the columns, a single, combined diagram must render to merge and compare both results visually[cite: 1].
+* **URL State Shareability:** Page reloads must instantly restore the selected state from the URL[cite: 1].
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 2. Evaluator's Focus Areas ("What We Are Looking For")
+* **Separation of Concerns:** Rigid separation between data access (hooks/fetching), domain logic (parsing/math), and presentation (components)[cite: 1].
+* **Idiomatic Code:** Production-grade React and TypeScript. Avoid `any` types completely[cite: 1].
+* **Component Composition:** Keep code DRY. Ensure the autocomplete search is a reusable, parameterized component rather than duplicated[cite: 1].
+* **UX Edge Cases:** Implement robust states for Loading, Error, and Empty states[cite: 1].
+* **Accessibility (a11y):** Complete keyboard navigation support for the autocomplete combobox and highly accessible alternatives for the diagrams (e.g., hidden screen-reader accessible tables with the raw data)[cite: 1].
+* **Targeted Testing:** Focused, high-value testing. At least 3 robust, meaningful tests (e.g., math parsing validation, autocomplete interactive behavior) rather than shallow coverage chasing[cite: 1].
 
-## Expanding the Oxlint configuration
+### 3. Architecture & Technical Constraints
+* **Pure Client-Side App:** Absolutely no database, custom backend servers, or API layers. All fetching, processing, and rendering happen on the client[cite: 1].
+* **CORS & Fixtures:** To bypass CORS, election data CSV files are committed directly to `src/assets/fixtures/`[cite: 1].
+* **URL Sync:** Public URL query parameters must use localized names `gebiet1` and `gebiet2` to preserve domain context, while the backing hooks and filenames use standard English (e.g., `useUrlState.ts`, `ElectionChart.tsx`).
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+### 4. Genuinely Optional Features (Bonus Kriterien)
+* **Wahl-Vergleich (2021):** Prepare the domain data model to track previous (2021) election values as deltas (e.g., +1.2% or -0.5%) in the single-area view[cite: 1].
+* **Spalten-Tausch (Column Swap):** Implement a button to swap the selection of Column 1 (`gebiet1`) and Column 2 (`gebiet2`)[cite: 1].
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
-```
+---
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+## 🛠️ How to Run the Project
+* Install dependencies: `npm install`
+* Run development server: `npm run dev`
+* Execute test suite: `npm run test`
