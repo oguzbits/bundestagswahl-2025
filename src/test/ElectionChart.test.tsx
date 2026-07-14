@@ -217,20 +217,20 @@ describe('ElectionChart Component', () => {
     const bar1 = bars[0];
     const bar2 = bars[1];
 
-    // Bar 1 should represent Gebiet 2 with "(heller)" suffix (declared first in JSX)
-    expect(bar1.getAttribute('data-name')).toBe('Hamburg (heller)');
-    expect(bar1.getAttribute('data-datakey')).toBe('percentage2');
+    // Bar 1 should represent Gebiet 1 (declared first in JSX)
+    expect(bar1.getAttribute('data-name')).toBe('Schleswig-Holstein');
+    expect(bar1.getAttribute('data-datakey')).toBe('percentage1');
 
-    // Bar 2 should represent Gebiet 1 (declared second)
-    expect(bar2.getAttribute('data-name')).toBe('Schleswig-Holstein');
-    expect(bar2.getAttribute('data-datakey')).toBe('percentage1');
+    // Bar 2 should represent Gebiet 2 (declared second)
+    expect(bar2.getAttribute('data-name')).toBe('Hamburg');
+    expect(bar2.getAttribute('data-datakey')).toBe('percentage2');
 
-    // Verify opacity: Cell 1 (comparison) should have opacity 0.4, Cell 4 (primary) should have opacity 1.0
+    // Verify opacity: Cell 1 (primary) should have opacity 1.0, Cell 4 (comparison) should have opacity 0.4
     const cells = screen.getAllByTestId('cell');
-    // First 3 cells are for Bar 1 (comparison: SPD, CDU, Sonstige)
-    expect(cells[0].getAttribute('data-fillopacity')).toBe('0.4');
-    // Next 3 cells are for Bar 2 (primary: SPD, CDU, Sonstige)
-    expect(cells[3].getAttribute('data-fillopacity')).toBe('1');
+    // First 3 cells are for Bar 1 (primary: SPD, CDU, Sonstige)
+    expect(cells[0].getAttribute('data-fillopacity')).toBe('1');
+    // Next 3 cells are for Bar 2 (comparison: SPD, CDU, Sonstige)
+    expect(cells[3].getAttribute('data-fillopacity')).toBe('0.4');
   });
 
   it('verifies Y-axis margins, domain, and tick formatter', () => {
@@ -262,13 +262,13 @@ describe('ElectionChart Component', () => {
     const labelLists = screen.getAllByTestId('label-list');
     expect(labelLists).toHaveLength(2);
 
-    expect(labelLists[0].getAttribute('data-datakey')).toBe('percentage2');
+    expect(labelLists[0].getAttribute('data-datakey')).toBe('percentage1');
     const textEl1 = labelLists[0].querySelector('text');
     expect(textEl1).toBeDefined();
     expect(textEl1?.textContent).toBe('31,7');
     expect(textEl1?.getAttribute('class')).toContain('hidden lg:block');
 
-    expect(labelLists[1].getAttribute('data-datakey')).toBe('percentage1');
+    expect(labelLists[1].getAttribute('data-datakey')).toBe('percentage2');
     const textEl2 = labelLists[1].querySelector('text');
     expect(textEl2).toBeDefined();
     expect(textEl2?.textContent).toBe('31,7');

@@ -290,6 +290,27 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
     return maxB - maxA;
   });
 
+  const renderCustomLegend = () => {
+    return (
+      <div className="flex justify-center items-center gap-6 pt-5 text-[13px] font-semibold text-slate-600">
+        <div className="flex items-center gap-2">
+          <span 
+            className="w-2 h-2 rounded-full inline-block" 
+            style={{ backgroundColor: '#475569' }}
+          />
+          <span>{name1}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span 
+            className="w-2 h-2 rounded-full inline-block" 
+            style={{ backgroundColor: '#cbd5e1' }}
+          />
+          <span>{name2}</span>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="bg-white rounded-2xl border border-slate-200 p-3 sm:p-6 shadow-sm space-y-4 sm:space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-100 pb-3 sm:pb-4">
@@ -330,22 +351,27 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
               />
               <Tooltip content={<CustomTooltip />} cursor={{ fill: '#f8fafc' }} position={{ y: 10 }} />
               {!compareWith ? null : (
-                <Legend
-                  verticalAlign="bottom"
-                  iconType="circle"
-                  iconSize={8}
-                  wrapperStyle={{ 
-                    fontSize: '13px', 
-                    fontWeight: 500, 
-                    color: '#475569',
-                    paddingTop: '20px'
-                  }}
-                />
+                <Legend content={renderCustomLegend} />
               )}
               
-              {/* Comparison region bar (only if compareWith is present) - rendered first to be in the background */}
+              {/* Primary region bar - rendered first */}
+              <Bar name={name1} dataKey="percentage1" radius={[4, 4, 0, 0]} fill="#475569">
+                {chartItems.map((entry, index) => (
+                  <Cell
+                    key={`cell-1-${index}`}
+                    fill={entry.partyColor}
+                    fillOpacity={1.0}
+                  />
+                ))}
+                <LabelList
+                  dataKey="percentage1"
+                  content={renderCustomLabel}
+                />
+              </Bar>
+
+              {/* Comparison region bar (only if compareWith is present) - rendered second */}
               {compareWith && (
-                <Bar name={`${name2} (heller)`} dataKey="percentage2" radius={[4, 4, 0, 0]}>
+                <Bar name={name2} dataKey="percentage2" radius={[4, 4, 0, 0]} fill="#cbd5e1">
                   {chartItems.map((entry, index) => (
                     <Cell
                       key={`cell-2-${index}`}
@@ -359,21 +385,6 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
                   />
                 </Bar>
               )}
-
-              {/* Primary region bar - rendered second to overlay in the foreground */}
-              <Bar name={name1} dataKey="percentage1" radius={[4, 4, 0, 0]}>
-                {chartItems.map((entry, index) => (
-                  <Cell
-                    key={`cell-1-${index}`}
-                    fill={entry.partyColor}
-                    fillOpacity={1.0}
-                  />
-                ))}
-                <LabelList
-                  dataKey="percentage1"
-                  content={renderCustomLabel}
-                />
-              </Bar>
             </BarChart>
           </ResponsiveContainer>
         </div>
