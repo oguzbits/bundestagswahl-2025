@@ -3,7 +3,7 @@ import { useElectionData } from './hooks/useElectionData';
 import { Autocomplete } from './components/Autocomplete';
 import { MetadataHeader } from './components/MetadataHeader';
 import { ElectionChart } from './components/ElectionChart';
-import { X, ArrowLeftRight } from 'lucide-react';
+import { RotateCcw, ArrowLeftRight } from 'lucide-react';
 
 export default function App() {
   const { gebiet1Id, gebiet2Id, setGebiet1Id, setGebiet2Id, clearSelection, swapPositions } = useUrlState();
@@ -66,9 +66,11 @@ export default function App() {
                   <div className="flex items-center gap-2">
                     <button
                       onClick={clearSelection}
-                      className="px-4 py-2 text-xs font-bold bg-red-50 text-red-700 hover:bg-red-100 rounded-xl transition-all border border-red-100 flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                      title="Auswahl zurücksetzen"
+                      aria-label="Auswahl zurücksetzen"
+                      className="p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all border border-slate-200 hover:border-red-200 flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
                     >
-                      <X className="h-3.5 w-3.5" /> Alle Auswahlen aufheben
+                      <RotateCcw className="h-4 w-4" />
                     </button>
                   </div>
                 )}

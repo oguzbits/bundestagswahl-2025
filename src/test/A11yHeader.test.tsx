@@ -114,7 +114,7 @@ describe('MetadataHeader Accessibility and Visual Layout', () => {
   it('renders accordion toggle button with accessibility attributes', () => {
     render(<MetadataHeader gebiet={mockGebiet} parentName={null} />);
     
-    const accordionBtn = screen.getByRole('button', { name: /Alle Parteien anzeigen/i });
+    const accordionBtn = screen.getByRole('button', { name: /Mehr Parteien anzeigen/i });
     expect(accordionBtn).toBeInTheDocument();
     expect(accordionBtn).toHaveAttribute('aria-expanded', 'false');
     expect(accordionBtn).toHaveAttribute('aria-controls', `minor-parties-${mockGebiet.id}`);

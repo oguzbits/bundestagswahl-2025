@@ -69,16 +69,16 @@ export function Autocomplete({
         >
           <span className="truncate flex-1 font-medium">
             {selectedOption ? (
-              <span className="text-slate-900 flex items-center gap-2">
+              <span className="text-slate-900 flex items-center gap-2 min-w-0">
                 <span className={cn(
-                  "text-[10px] font-bold px-1.5 py-0.5 rounded-md uppercase tracking-wider border",
+                  "text-[10px] font-bold px-1.5 py-0.5 rounded-md uppercase tracking-wider border shrink-0",
                   selectedOption.type === 'Bund' && "bg-slate-900 text-white border-slate-900",
                   selectedOption.type === 'Land' && "bg-indigo-50 text-indigo-700 border-indigo-100",
                   selectedOption.type === 'Wahlkreis' && "bg-slate-100 text-slate-600 border-slate-200"
                 )}>
                   {selectedOption.type}
                 </span>
-                <span>{selectedOption.name}</span>
+                <span className="truncate">{selectedOption.name}</span>
               </span>
             ) : (
               placeholder
@@ -106,7 +106,7 @@ export function Autocomplete({
           </div>
         </PopoverTrigger>
         <PopoverContent 
-          className="p-0 w-[var(--radix-popover-trigger-width)] max-w-full overflow-hidden shadow-xl border border-slate-200 rounded-xl bg-white"
+          className="p-0 w-[var(--anchor-width)] max-w-[calc(100vw-2rem)] overflow-hidden shadow-xl border border-slate-200 rounded-xl bg-white"
           align="start"
         >
           <Command
@@ -151,11 +151,11 @@ export function Autocomplete({
                       }}
                       className="flex items-center justify-between py-2 px-3 rounded-lg cursor-pointer text-sm font-medium hover:bg-slate-50 aria-selected:bg-slate-100"
                     >
-                      <span className="flex items-center gap-2">
-                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-900 text-white border border-slate-900 uppercase tracking-wider">
+                      <span className="flex items-center gap-2 min-w-0 flex-1">
+                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-900 text-white border border-slate-900 uppercase tracking-wider shrink-0">
                           Bund
                         </span>
-                        <span className="text-slate-900 font-bold">{option.name}</span>
+                        <span className="text-slate-900 font-bold truncate">{option.name}</span>
                       </span>
                       {selectedId === option.id && (
                         <Check className="h-4 w-4 text-indigo-600 shrink-0" />
@@ -178,11 +178,11 @@ export function Autocomplete({
                       }}
                       className="flex items-center justify-between py-2 px-3 rounded-lg cursor-pointer text-sm font-medium hover:bg-slate-50 aria-selected:bg-slate-100"
                     >
-                      <span className="flex items-center gap-2">
-                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-100 uppercase tracking-wider">
+                      <span className="flex items-center gap-2 min-w-0 flex-1">
+                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-100 uppercase tracking-wider shrink-0">
                           Land
                         </span>
-                        <span className="text-slate-800">{option.name}</span>
+                        <span className="text-slate-800 truncate">{option.name}</span>
                       </span>
                       {selectedId === option.id && (
                         <Check className="h-4 w-4 text-indigo-600 shrink-0" />
@@ -205,15 +205,15 @@ export function Autocomplete({
                       }}
                       className="flex items-center justify-between py-2 px-3 rounded-lg cursor-pointer text-sm font-medium hover:bg-slate-50 aria-selected:bg-slate-100"
                     >
-                      <div className="flex flex-col gap-0.5">
-                        <div className="flex items-center gap-2">
+                      <div className="flex flex-col gap-0.5 min-w-0 flex-1">
+                        <div className="flex items-center gap-2 min-w-0">
                           <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200 uppercase tracking-wider shrink-0">
                             Wkr {option.id}
                           </span>
                           <span className="text-slate-800 truncate font-semibold">{option.name}</span>
                         </div>
                         {option.parentName && (
-                          <span className="text-xs text-slate-400 font-normal pl-1">
+                          <span className="text-xs text-slate-400 font-normal pl-1 truncate">
                             gehört zu {option.parentName}
                           </span>
                         )}

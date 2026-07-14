@@ -142,7 +142,7 @@ describe('MetadataHeader Delta Calculations & Formatting', () => {
     expect(screen.queryByText('Piratenpartei Deutschland')).toBeNull();
 
     // Click to show all
-    const toggleButton = screen.getByText('Alle Parteien anzeigen');
+    const toggleButton = screen.getByText('Mehr Parteien anzeigen');
     fireEvent.click(toggleButton);
 
     // Minor parties should now be visible

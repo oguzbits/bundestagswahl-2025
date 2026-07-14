@@ -240,7 +240,7 @@ export function MetadatenHeader({ gebiet, parentName }: MetadataHeaderProps) {
                       aria-controls={`minor-parties-${gebiet.id}`}
                       className="w-full py-2 px-3 flex items-center justify-between text-xs font-semibold text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-xl transition-all border border-slate-200 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                     >
-                      <span>{showAll ? 'Weniger anzeigen' : 'Alle Parteien anzeigen'}</span>
+                      <span>{showAll ? 'Weniger anzeigen' : 'Mehr Parteien anzeigen'}</span>
                       {showAll ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                     </button>
                   }
