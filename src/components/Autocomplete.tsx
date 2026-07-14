@@ -129,7 +129,7 @@ export function Autocomplete({
             }}
           >
             <CommandInput 
-              placeholder="Nach Name, Bundesland oder ID suchen..." 
+              placeholder="Name, Bundesland oder ID suchen..." 
               value={searchQuery}
               onValueChange={setSearchQuery}
             />
