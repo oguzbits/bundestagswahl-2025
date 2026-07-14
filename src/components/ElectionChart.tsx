@@ -123,10 +123,10 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
     });
   }
 
-  // Round percentages to 1 decimal place
-  primarySonstigePercent = Math.round(primarySonstigePercent * 10) / 10;
-  primarySonstigePercent2021 = Math.round(primarySonstigePercent2021 * 10) / 10;
-  compareSonstigePercent = Math.round(compareSonstigePercent * 10) / 10;
+  // Round percentages to 2 decimal places
+  primarySonstigePercent = Math.round(primarySonstigePercent * 100) / 100;
+  primarySonstigePercent2021 = Math.round(primarySonstigePercent2021 * 100) / 100;
+  compareSonstigePercent = Math.round(compareSonstigePercent * 100) / 100;
 
   // Add "Sonstige" if there are any remaining votes
   if (primarySonstigeVotes > 0 || compareSonstigeVotes > 0) {
@@ -157,7 +157,7 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
   const formatDelta = (current: number, prev: number) => {
     const delta = current - prev;
     const sign = delta >= 0 ? '+' : '';
-    return `${sign}${delta.toFixed(1)}%`;
+    return `${sign}${delta.toFixed(2)}%`;
   };
 
   // Custom Tooltip component
@@ -189,7 +189,7 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
               )}
               <p className="text-slate-800">
                 <span className="font-bold text-base">
-                  {payload[0].value?.toLocaleString('de-DE')}%
+                  {payload[0].value !== undefined ? Number(payload[0].value).toFixed(2) : ''}%
                 </span>
                 {isSingleMode && deltaStr && (
                   <span className={`text-xs font-semibold ml-2 ${deltaStr.startsWith('+') ? 'text-emerald-600' : 'text-rose-600'}`}>
@@ -206,7 +206,7 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
                 <p className="font-semibold text-xs text-slate-500 uppercase tracking-wider">{name2}</p>
                 <p className="text-slate-800">
                   <span className="font-bold text-base">
-                    {payload[1].value?.toLocaleString('de-DE')}%
+                    {payload[1].value !== undefined ? Number(payload[1].value).toFixed(2) : ''}%
                   </span>
                   <span className="text-xs text-slate-500 ml-1.5 block sm:inline">
                     ({(payload[1].payload as ChartDataItem).votes2?.toLocaleString('de-DE')} Stimmen)
@@ -277,6 +277,7 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
               stroke="#64748b"
               fontSize={12}
               unit="%"
+              tickFormatter={(value) => value.toFixed(2)}
             />
             <Tooltip content={<CustomTooltip />} cursor={{ fill: '#f8fafc' }} />
             {!compareWith ? null : (

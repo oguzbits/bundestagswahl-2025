@@ -1,8 +1,8 @@
 import type { GebietTyp, GebietErgebnis, ParteiErgebnis, WahlDatenMap } from './types';
 
-// Helper to round numbers to 1 decimal place
-function roundToOneDecimal(val: number): number {
-  return Math.round(val * 10) / 10;
+// Helper to round numbers to 2 decimal places robustly
+function roundToTwoDecimals(val: number): number {
+  return Math.round((val + Number.EPSILON) * 100) / 100;
 }
 
 // Helper to parse integers safely with fallback to 0
@@ -148,16 +148,16 @@ export function parseElectionData(
     const waehler2021 = parseSafeInt(parts[9]);
 
     const wahlbeteiligung = wahlberechtigte > 0
-      ? roundToOneDecimal((waehler / wahlberechtigte) * 100)
+      ? roundToTwoDecimals((waehler / wahlberechtigte) * 100)
       : 0;
 
     const wahlbeteiligung2021 = wahlberechtigte2021 > 0
-      ? roundToOneDecimal((waehler2021 / wahlberechtigte2021) * 100)
+      ? roundToTwoDecimals((waehler2021 / wahlberechtigte2021) * 100)
       : 0;
 
     // Valid second votes
-    const gueltigeZweitstimmen = parseSafeInt(parts[16]);
-    const gueltigeZweitstimmen2021 = parseSafeInt(parts[17]);
+    const gueltigeZweitstimmen = parseSafeInt(parts[18]);
+    const gueltigeZweitstimmen2021 = parseSafeInt(parts[19]);
 
     // Party results
     const parteien: ParteiErgebnis[] = [];
@@ -167,11 +167,11 @@ export function parseElectionData(
       const zAbs2021 = parseSafeInt(parts[partyCol.colIndex + 3]);
 
       const zRel = gueltigeZweitstimmen > 0
-        ? roundToOneDecimal((zAbs / gueltigeZweitstimmen) * 100)
+        ? roundToTwoDecimals((zAbs / gueltigeZweitstimmen) * 100)
         : 0;
 
       const zRel2021 = gueltigeZweitstimmen2021 > 0
-        ? roundToOneDecimal((zAbs2021 / gueltigeZweitstimmen2021) * 100)
+        ? roundToTwoDecimals((zAbs2021 / gueltigeZweitstimmen2021) * 100)
         : 0;
 
       // Only include the party results if there were votes (absolut or absolut2021 > 0)

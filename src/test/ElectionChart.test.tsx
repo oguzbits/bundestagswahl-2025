@@ -162,14 +162,14 @@ describe('ElectionChart Component', () => {
     const expectedSonstige1 = Math.round(
       mockGebiet1.parteien
         .filter((p) => !isMajorParty(p))
-        .reduce((sum, p) => sum + p.zweitstimmenRelativ, 0) * 10
-    ) / 10;
+        .reduce((sum, p) => sum + p.zweitstimmenRelativ, 0) * 100
+    ) / 100;
 
     const expectedSonstige2 = Math.round(
       mockGebiet2.parteien
         .filter((p) => !isMajorParty(p))
-        .reduce((sum, p) => sum + p.zweitstimmenRelativ, 0) * 10
-    ) / 10;
+        .reduce((sum, p) => sum + p.zweitstimmenRelativ, 0) * 100
+    ) / 100;
 
     expect(sonstige.percentage1).toBe(expectedSonstige1);
     expect(sonstige.percentage2).toBe(expectedSonstige2);

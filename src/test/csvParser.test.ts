@@ -42,9 +42,9 @@ Endergebnis
 Nr;Gebiet;gehört zu;Gewählt;Wahlberechtigte;;;;Wählende;;;;Ungültige Stimmen;;;;Gültige Stimmen;;;;Sozialdemokratische Partei Deutschlands;;;;Christlich Demokratische Union Deutschlands;;;;BÜNDNIS 90/DIE GRÜNEN;;;;
 ;;;;Erststimmen;;Zweitstimmen;;Erststimmen;;Zweitstimmen;;Erststimmen;;Zweitstimmen;;Erststimmen;;Zweitstimmen;;Erststimmen;;Zweitstimmen;;Erststimmen;;Zweitstimmen;;Erststimmen;;Zweitstimmen;;
 ;;;;Endgültig;Vorperiode;Endgültig;Vorperiode;Endgültig;Vorperiode;Endgültig;Vorperiode;Endgültig;Vorperiode;Endgültig;Vorperiode;Endgültig;Vorperiode;Endgültig;Vorperiode;Endgültig;Vorperiode;Endgültig;Vorperiode;Endgültig;Vorperiode;
-99;Bund;;;1000;800;;;800;600;;;10;20;;;990;580;;;;;200;150;;;300;200;;;490;230;;;
-1;Schleswig-Holstein;99;;500;400;;;400;300;;;5;10;;;495;290;;;;;100;75;;;150;100;;;245;115;;;
-100;Testkreis A;1;;300;250;;;250;200;;;2;5;;;297;195;;;;;60;50;;;97;70;;;140;75;;;
+99;Bund;;;1000;800;;;800;600;;;10;20;;;990;580;990;580;;;200;150;;;300;200;;;490;230;;;
+1;Schleswig-Holstein;99;;500;400;;;400;300;;;5;10;;;495;290;495;290;;;100;75;;;150;100;;;245;115;;;
+100;Testkreis A;1;;300;250;;;250;200;;;2;5;;;297;195;297;195;;;60;50;;;97;70;;;140;75;;;
 `;
 
   it('correctly parses election results and classifies regions', () => {
@@ -94,14 +94,14 @@ Nr;Gebiet;gehört zu;Gewählt;Wahlberechtigte;;;;Wählende;;;;Ungültige Stimmen
     const totalGueltige = 990;
     const totalGueltige2021 = 580;
 
-    const expectedGrueneRel = Math.round((490 / totalGueltige) * 100 * 10) / 10;
-    const expectedGrueneRel2021 = Math.round((230 / totalGueltige2021) * 100 * 10) / 10;
+    const expectedGrueneRel = Math.round((490 / totalGueltige) * 100 * 100) / 100;
+    const expectedGrueneRel2021 = Math.round((230 / totalGueltige2021) * 100 * 100) / 100;
 
-    const expectedCduRel = Math.round((300 / totalGueltige) * 100 * 10) / 10;
-    const expectedCduRel2021 = Math.round((200 / totalGueltige2021) * 100 * 10) / 10;
+    const expectedCduRel = Math.round((300 / totalGueltige) * 100 * 100) / 100;
+    const expectedCduRel2021 = Math.round((200 / totalGueltige2021) * 100 * 100) / 100;
 
-    const expectedSpdRel = Math.round((200 / totalGueltige) * 100 * 10) / 10;
-    const expectedSpdRel2021 = Math.round((150 / totalGueltige2021) * 100 * 10) / 10;
+    const expectedSpdRel = Math.round((200 / totalGueltige) * 100 * 100) / 100;
+    const expectedSpdRel2021 = Math.round((150 / totalGueltige2021) * 100 * 100) / 100;
 
     expect(bund.parteien[0].parteiKurz).toBe('GRÜNE');
     expect(bund.parteien[0].zweitstimmenRelativ).toBe(expectedGrueneRel);
@@ -116,6 +116,40 @@ Nr;Gebiet;gehört zu;Gewählt;Wahlberechtigte;;;;Wählende;;;;Ungültige Stimmen
     expect(bund.parteien[2].zweitstimmenRelativ2021).toBe(expectedSpdRel2021);
   });
 
+  it('specifically verifies BSW (or a mock party with 4.981%) and another mock party with 4.989% are correctly parsed as 4.98% and 4.99% respectively, and do not round up to 5.0%', () => {
+    const bswMockParteien = `
+# (c) Die Bundeswahlleiterin
+Gruppenschluessel;Gruppenart_XML;Gruppenart_CSV;GruppennameKurz;Gruppenname
+4;PARTEI;Partei;BSW;Bündnis Sahra Wagenknecht
+5;PARTEI;Partei;PTY;Partei Y
+`;
+    const bswMockKerg = `(c) Bundeswahlleiter
+License Info
+Empty
+Bundestagswahl 2025
+Endergebnis
+Nr;Gebiet;gehört zu;Gewählt;Wahlberechtigte;;;;Wählende;;;;Ungültige Stimmen;;;;Gültige Stimmen;;;;Bündnis Sahra Wagenknecht;;;;Partei Y;;;;
+;;;;Erststimmen;;Zweitstimmen;;Erststimmen;;Zweitstimmen;;Erststimmen;;Zweitstimmen;;Erststimmen;;Zweitstimmen;;Erststimmen;;Zweitstimmen;;Erststimmen;;Zweitstimmen;;Erststimmen;;Zweitstimmen;;
+;;;;Endgültig;Vorperiode;Endgültig;Vorperiode;Endgültig;Vorperiode;Endgültig;Vorperiode;Endgültig;Vorperiode;Endgültig;Vorperiode;Endgültig;Vorperiode;Endgültig;Vorperiode;Endgültig;Vorperiode;
+99;Bund;;;100000;100000;;;100000;100000;;;0;0;;;100000;100000;100000;100000;;;4981;4981;;;4989;4989;;;
+`;
+    const results = parseElectionData(bswMockKerg, bswMockParteien, mockWahlkreiseCsv);
+    const bund = results['99'];
+    const bsw = bund.parteien.find(p => p.parteiKurz === 'BSW');
+    const pty = bund.parteien.find(p => p.parteiKurz === 'PTY');
+    
+    expect(bsw).toBeDefined();
+    expect(pty).toBeDefined();
+    
+    // 4981 / 100000 * 100 = 4.981%, should round to exactly 4.98%
+    expect(bsw?.zweitstimmenRelativ).toBe(4.98);
+    expect(bsw?.zweitstimmenRelativ).not.toBe(5.0);
+    
+    // 4989 / 100000 * 100 = 4.989%, should round to exactly 4.99%
+    expect(pty?.zweitstimmenRelativ).toBe(4.99);
+    expect(pty?.zweitstimmenRelativ).not.toBe(5.0);
+  });
+
   it('falls back safely when division by zero occurs or values are missing', () => {
     const zeroKergCsv = `(c) Bundeswahlleiter
 License Info
@@ -125,7 +159,7 @@ Endergebnis
 Nr;Gebiet;gehört zu;Gewählt;Wahlberechtigte;;;;Wählende;;;;Ungültige Stimmen;;;;Gültige Stimmen;;;;Sozialdemokratische Partei Deutschlands;;;;CDU;;;;
 ;;;;Erststimmen;;Zweitstimmen;;Erststimmen;;Zweitstimmen;;Erststimmen;;Zweitstimmen;;Erststimmen;;Zweitstimmen;;Erststimmen;;Zweitstimmen;;Erststimmen;;Zweitstimmen;;
 ;;;;Endgültig;Vorperiode;Endgültig;Vorperiode;Endgültig;Vorperiode;Endgültig;Vorperiode;Endgültig;Vorperiode;Endgültig;Vorperiode;Endgültig;Vorperiode;Endgültig;Vorperiode;Endgültig;Vorperiode;
-99;Bund;;;0;0;;;100;100;;;10;10;;;0;0;;;200;150;;;300;200;;;
+99;Bund;;;0;0;;;100;100;;;10;10;;;0;0;0;0;;;200;150;;;300;200;;;
 `;
     const results = parseElectionData(zeroKergCsv, mockParteienCsv, mockWahlkreiseCsv);
     const bund = results['99'];
@@ -134,5 +168,38 @@ Nr;Gebiet;gehört zu;Gewählt;Wahlberechtigte;;;;Wählende;;;;Ungültige Stimmen
     expect(bund.wahlbeteiligung2021).toBe(0);
     expect(bund.parteien[0].zweitstimmenRelativ).toBe(0);
     expect(bund.parteien[0].zweitstimmenRelativ2021).toBe(0);
+  });
+
+  it('mathematically validates dynamic percentage calculations and sum matching 100%', () => {
+    const mockParteien = `
+# (c) Die Bundeswahlleiterin
+Gruppenschluessel;Gruppenart_XML;Gruppenart_CSV;GruppennameKurz;Gruppenname
+1;PARTEI;Partei;ParteiA;Partei A
+2;PARTEI;Partei;ParteiB;Partei B
+3;PARTEI;Partei;ParteiC;Partei C
+`;
+    const mockKerg = `(c) Bundeswahlleiter
+License Info
+Empty
+Bundestagswahl 2025
+Endergebnis
+Nr;Gebiet;gehört zu;Gewählt;Wahlberechtigte;;;;Wählende;;;;Ungültige Stimmen;;;;Gültige Stimmen;;;;Partei A;;;;Partei B;;;;Partei C;;;;
+;;;;Erststimmen;;Zweitstimmen;;Erststimmen;;Zweitstimmen;;Erststimmen;;Zweitstimmen;;Erststimmen;;Zweitstimmen;;Erststimmen;;Zweitstimmen;;Erststimmen;;Zweitstimmen;;Erststimmen;;Zweitstimmen;;Erststimmen;;Zweitstimmen;;
+;;;;Endgültig;Vorperiode;Endgültig;Vorperiode;Endgültig;Vorperiode;Endgültig;Vorperiode;Endgültig;Vorperiode;Endgültig;Vorperiode;Endgültig;Vorperiode;Endgültig;Vorperiode;Endgültig;Vorperiode;
+99;Bund;;;10000;10000;;;10000;10000;;;0;0;;;10000;10000;10000;10000;;;3333;3333;;;3333;3333;;;3334;3334;;;
+`;
+    const results = parseElectionData(mockKerg, mockParteien, mockWahlkreiseCsv);
+    const bund = results['99'];
+
+    const pA = bund.parteien.find(p => p.parteiKurz === 'ParteiA');
+    const pB = bund.parteien.find(p => p.parteiKurz === 'ParteiB');
+    const pC = bund.parteien.find(p => p.parteiKurz === 'ParteiC');
+
+    expect(pA?.zweitstimmenRelativ).toBe(33.33);
+    expect(pB?.zweitstimmenRelativ).toBe(33.33);
+    expect(pC?.zweitstimmenRelativ).toBe(33.34);
+
+    const sum = bund.parteien.reduce((acc, p) => acc + p.zweitstimmenRelativ, 0);
+    expect(Math.abs(sum - 100.0)).toBeLessThanOrEqual(0.01);
   });
 });

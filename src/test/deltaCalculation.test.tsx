@@ -81,19 +81,17 @@ describe('MetadataHeader Delta Calculations & Formatting', () => {
     // Positive Delta: SPD
     const spdData = mockGebiet.parteien.find((p) => p.parteiKurz === 'SPD')!;
     const spdDelta = spdData.zweitstimmenRelativ - spdData.zweitstimmenRelativ2021;
-    const spdExpected = `(+${spdDelta.toFixed(1)}%)`;
+    const spdExpected = `(+${spdDelta.toFixed(2)}%)`;
     expect(screen.getByText(spdExpected)).toBeInTheDocument();
 
     // Negative Delta: CDU
     const cduData = mockGebiet.parteien.find((p) => p.parteiKurz === 'CDU')!;
     const cduDelta = cduData.zweitstimmenRelativ - cduData.zweitstimmenRelativ2021;
-    const cduExpected = `(${cduDelta.toFixed(1)}%)`;
+    const cduExpected = `(${cduDelta.toFixed(2)}%)`;
     expect(screen.getByText(cduExpected)).toBeInTheDocument();
 
     // Zero Delta: GRÜNE
-    const grueneData = mockGebiet.parteien.find((p) => p.parteiKurz === 'GRÜNE')!;
-    const grueneDelta = grueneData.zweitstimmenRelativ - grueneData.zweitstimmenRelativ2021;
-    const grueneExpected = `(${grueneDelta.toFixed(1)}%)`;
+    const grueneExpected = `(0.00%)`;
     expect(screen.getByText(grueneExpected)).toBeInTheDocument();
 
     // New Party: BSW should show (neu)
@@ -116,20 +114,20 @@ describe('MetadataHeader Delta Calculations & Formatting', () => {
 
     const expectedAbs = minorParties.reduce((sum, p) => sum + p.zweitstimmenAbsolut, 0);
     const rawRel = minorParties.reduce((sum, p) => sum + p.zweitstimmenRelativ, 0);
-    const expectedRel = Math.round(rawRel * 10) / 10;
+    const expectedRel = Math.round(rawRel * 100) / 100;
     
     const rawRel2021 = minorParties.reduce((sum, p) => sum + p.zweitstimmenRelativ2021, 0);
-    const expectedRel2021 = Math.round(rawRel2021 * 10) / 10;
+    const expectedRel2021 = Math.round(rawRel2021 * 100) / 100;
     
     const delta = expectedRel - expectedRel2021;
     const expectedDeltaText = delta > 0 
-      ? `(+${delta.toFixed(1)}%)` 
+      ? `(+${delta.toFixed(2)}%)` 
       : delta < 0 
-        ? `(${delta.toFixed(1)}%)` 
-        : '(0.0%)';
+        ? `(${delta.toFixed(2)}%)` 
+        : '(0.00%)';
 
     expect(screen.getByText('Sonstige')).toBeInTheDocument();
-    expect(screen.getByText(`${expectedRel.toFixed(1)}%`)).toBeInTheDocument();
+    expect(screen.getByText(`${expectedRel.toFixed(2)}%`)).toBeInTheDocument();
     expect(screen.getByText(expectedDeltaText)).toBeInTheDocument();
     expect(screen.getByText(`${expectedAbs.toLocaleString('de-DE')} Stimmen`)).toBeInTheDocument();
 
@@ -150,5 +148,49 @@ describe('MetadataHeader Delta Calculations & Formatting', () => {
     // Minor parties should now be visible
     expect(screen.getByText('PIRATEN')).toBeInTheDocument();
     expect(screen.getByText('ÖDP')).toBeInTheDocument();
+  });
+
+  it('asserts that under no circumstances is a value like 4.98132% or 4.989% rounded to 5% or 5.0% in the UI, and formats with exactly 2 decimal places', () => {
+    const precisionMockGebiet: GebietErgebnis = {
+      id: '99',
+      name: 'Bund',
+      typ: 'Bund',
+      uebergeordnetesGebietId: null,
+      wahlberechtigte: 100000,
+      waehler: 100000,
+      wahlbeteiligung: 80.0,
+      wahlbeteiligung2021: 75.0,
+      gueltigeZweitstimmen: 100000,
+      gueltigeZweitstimmen2021: 100000,
+      parteien: [
+        {
+          parteiKurz: 'CDU',
+          parteiLang: 'Christlich Demokratische Union',
+          zweitstimmenAbsolut: 4981,
+          zweitstimmenRelativ: 4.98,
+          zweitstimmenAbsolut2021: 4900,
+          zweitstimmenRelativ2021: 4.90,
+        },
+        {
+          parteiKurz: 'SPD',
+          parteiLang: 'Sozialdemokratische Partei Deutschlands',
+          zweitstimmenAbsolut: 4989,
+          zweitstimmenRelativ: 4.99,
+          zweitstimmenAbsolut2021: 4900,
+          zweitstimmenRelativ2021: 4.90,
+        }
+      ],
+    };
+
+    render(<MetadataHeader gebiet={precisionMockGebiet} parentName={null} />);
+
+    // Assert exact 2-decimal-place representation
+    expect(screen.getByText('4.98%')).toBeInTheDocument();
+    expect(screen.getByText('4.99%')).toBeInTheDocument();
+
+    // Assert that they are not rounded to 5% or 5.0%
+    expect(screen.queryByText('5%')).toBeNull();
+    expect(screen.queryByText('5.0%')).toBeNull();
+    expect(screen.queryByText('5.00%')).toBeNull();
   });
 });

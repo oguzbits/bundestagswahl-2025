@@ -35,12 +35,12 @@ export function MetadatenHeader({ gebiet, parentName }: MetadataHeaderProps) {
     }
     const delta = current - prev;
     if (delta > 0) {
-      return { text: `+${delta.toFixed(1)}%`, className: 'text-emerald-600 font-bold' };
+      return { text: `+${delta.toFixed(2)}%`, className: 'text-emerald-600 font-bold' };
     }
     if (delta < 0) {
-      return { text: `${delta.toFixed(1)}%`, className: 'text-rose-600 font-bold' };
+      return { text: `${delta.toFixed(2)}%`, className: 'text-rose-600 font-bold' };
     }
-    return { text: '0.0%', className: 'text-slate-400' };
+    return { text: '0.00%', className: 'text-slate-400' };
   };
 
   // Smart Filtering and Grouping Logic
@@ -73,9 +73,9 @@ export function MetadatenHeader({ gebiet, parentName }: MetadataHeaderProps) {
     sonstigeRelativ2021 += p.zweitstimmenRelativ2021;
   });
 
-  // Round relative values to 1 decimal place
-  sonstigeRelativ = Math.round(sonstigeRelativ * 10) / 10;
-  sonstigeRelativ2021 = Math.round(sonstigeRelativ2021 * 10) / 10;
+  // Round relative values to 2 decimal places
+  sonstigeRelativ = Math.round(sonstigeRelativ * 100) / 100;
+  sonstigeRelativ2021 = Math.round(sonstigeRelativ2021 * 100) / 100;
 
   // Create virtual "Sonstige" row if there are minor parties
   const sonstigeRow: ParteiErgebnis | null = minorParties.length > 0 ? {
@@ -146,7 +146,7 @@ export function MetadatenHeader({ gebiet, parentName }: MetadataHeaderProps) {
           <div className="bg-indigo-50/50 rounded-xl p-3 border border-indigo-100 flex flex-col justify-center">
             <div className="text-[10px] text-indigo-600 font-bold uppercase tracking-wider">Wahlbeteiligung</div>
             <div className="text-base sm:text-lg font-black text-indigo-700 mt-0.5 font-mono">
-              {gebiet.wahlbeteiligung}%
+              {gebiet.wahlbeteiligung.toFixed(2)}%
             </div>
           </div>
         </div>
@@ -181,7 +181,7 @@ export function MetadatenHeader({ gebiet, parentName }: MetadataHeaderProps) {
                     {/* Right: Current relative percentage (bold) + its dynamic 2021 delta in parentheses */}
                     <div className="flex items-center space-x-1.5 font-mono">
                       <span className="font-bold text-sm text-slate-900">
-                        {p.zweitstimmenRelativ.toFixed(1)}%
+                        {p.zweitstimmenRelativ.toFixed(2)}%
                       </span>
                       <span className={cn("text-xs font-semibold", deltaInfo.className)}>
                         ({deltaInfo.text})
@@ -247,7 +247,7 @@ export function MetadatenHeader({ gebiet, parentName }: MetadataHeaderProps) {
                         </span>
                         <div className="flex items-center space-x-1.5 shrink-0">
                           <span className="text-slate-800 font-bold font-mono">
-                            {p.zweitstimmenRelativ.toFixed(1)}%
+                            {p.zweitstimmenRelativ.toFixed(2)}%
                           </span>
                           <span className={cn("text-[10px] font-mono", deltaInfo.className)}>
                             ({deltaInfo.text})

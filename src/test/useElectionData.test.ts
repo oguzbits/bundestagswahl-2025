@@ -30,7 +30,7 @@ Endergebnis
 Nr;Gebiet;gehört zu;Gewählt;Wahlberechtigte;;;;Wählende;;;;Ungültige Stimmen;;;;Gültige Stimmen;;;;Sozialdemokratische Partei Deutschlands;;;;Christlich Demokratische Union Deutschlands;;;;BÜNDNIS 90/DIE GRÜNEN;;;;
 ;;;;Erststimmen;;Zweitstimmen;;Erststimmen;;Zweitstimmen;;Erststimmen;;Zweitstimmen;;Erststimmen;;Zweitstimmen;;Erststimmen;;Zweitstimmen;;Erststimmen;;Zweitstimmen;;Erststimmen;;Zweitstimmen;;Erststimmen;;Zweitstimmen;;
 ;;;;Endgültig;Vorperiode;Endgültig;Vorperiode;Endgültig;Vorperiode;Endgültig;Vorperiode;Endgültig;Vorperiode;Endgültig;Vorperiode;Endgültig;Vorperiode;Endgültig;Vorperiode;Endgültig;Vorperiode;Endgültig;Vorperiode;Endgültig;Vorperiode;Endgültig;Vorperiode;
-99;Bund;;;1000;800;;;800;600;;;10;20;;;990;580;;;;;200;150;;;300;200;;;490;230;;;`;
+99;Bund;;;1000;800;;;800;600;;;10;20;;;990;580;990;580;;;200;150;;;300;200;;;490;230;;;`;
 
     const mockParteienCsv = `
 # (c) Die Bundeswahlleiterin
