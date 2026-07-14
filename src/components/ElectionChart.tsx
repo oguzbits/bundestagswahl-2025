@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import {
   BarChart,
   Bar,
@@ -53,7 +54,9 @@ export const formatFloorPercentage = (value: number): string => {
 const renderCustomLabel = (props: any) => {
   const { x = 0, y = 0, width = 0, value } = props;
   const offset = 8;
-  const displayValue = typeof value === 'number' ? formatFloorPercentage(value) : '';
+  const displayValue = typeof value === 'number' 
+    ? `${(Math.floor(value * 10) / 10).toFixed(1)}`.replace('.', ',')
+    : '';
 
   return (
     <g>
@@ -73,6 +76,16 @@ const renderCustomLabel = (props: any) => {
 };
 
 export function ElectionChart({ data, title, compareWith }: ElectionChartProps) {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // 1. Determine which parties to show as major parties and aggregate the rest into "Sonstige"
   const isMajorParty = (p: { parteiKurz: string; parteiLang: string; zweitstimmenRelativ: number }) => {
@@ -278,80 +291,92 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
   });
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-100 pb-4">
+    <div className="bg-white rounded-2xl border border-slate-200 p-3 sm:p-6 shadow-sm space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-100 pb-3 sm:pb-4">
         <h3 className="text-lg font-bold text-slate-800 tracking-tight">{title}</h3>
         <span className="text-xs text-slate-500 font-medium">Zweitstimmenanteil in %</span>
       </div>
 
-      <div className="w-full h-[400px] relative">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart
-            data={chartItems}
-            margin={{ top: 20, right: 10, left: 20, bottom: 5 }}
-            barGap={0}
-          >
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-            <XAxis
-              dataKey="party"
-              tickLine={false}
-              axisLine={false}
-              stroke="#64748b"
-              fontSize={12}
-              fontWeight={600}
-            />
-            <YAxis
-              tickLine={false}
-              axisLine={false}
-              stroke="#64748b"
-              fontSize={12}
-              domain={['auto', 'auto']}
-              tickFormatter={(value) => formatFloorPercentage(value)}
-            />
-            <Tooltip content={<CustomTooltip />} cursor={{ fill: '#f8fafc' }} />
-            {!compareWith ? null : (
-              <Legend
-                verticalAlign="top"
-                height={36}
-                iconType="circle"
-                iconSize={8}
-                wrapperStyle={{ fontSize: '13px', fontWeight: 500, color: '#475569' }}
+      <div className="w-full relative">
+        <div className="h-[360px] sm:h-[420px] w-full relative">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              key={isMobile ? 'mobile' : 'desktop'}
+              data={chartItems}
+              margin={{ top: 20, right: 5, left: 0, bottom: 5 }}
+              barGap={-6}
+              barCategoryGap="12%"
+            >
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+              <XAxis
+                dataKey="party"
+                tickLine={false}
+                axisLine={false}
+                stroke="#64748b"
+                fontSize={11}
+                fontWeight={600}
+                angle={isMobile ? -45 : 0}
+                textAnchor={isMobile ? 'end' : 'middle'}
+                height={isMobile ? 55 : 30}
               />
-            )}
-            
-            {/* Primary region bar */}
-            <Bar name={name1} dataKey="percentage1" radius={[4, 4, 0, 0]}>
-              {chartItems.map((entry, index) => (
-                <Cell
-                  key={`cell-1-${index}`}
-                  fill={entry.partyColor}
-                  fillOpacity={1.0}
+              <YAxis
+                width={35}
+                tickLine={false}
+                axisLine={false}
+                stroke="#64748b"
+                fontSize={11}
+                domain={[0, 'auto']}
+                tickFormatter={(value) => `${Math.floor(value)}`}
+              />
+              <Tooltip content={<CustomTooltip />} cursor={{ fill: '#f8fafc' }} />
+              {!compareWith ? null : (
+                <Legend
+                  verticalAlign="bottom"
+                  iconType="circle"
+                  iconSize={8}
+                  wrapperStyle={{ 
+                    fontSize: '13px', 
+                    fontWeight: 500, 
+                    color: '#475569',
+                    paddingTop: '20px'
+                  }}
                 />
-              ))}
-              <LabelList
-                dataKey="percentage1"
-                content={renderCustomLabel}
-              />
-            </Bar>
+              )}
+              
+              {/* Comparison region bar (only if compareWith is present) - rendered first to be in the background */}
+              {compareWith && (
+                <Bar name={`${name2} (heller)`} dataKey="percentage2" radius={[4, 4, 0, 0]}>
+                  {chartItems.map((entry, index) => (
+                    <Cell
+                      key={`cell-2-${index}`}
+                      fill={entry.partyColor}
+                      fillOpacity={0.4}
+                    />
+                  ))}
+                  <LabelList
+                    dataKey="percentage2"
+                    content={renderCustomLabel}
+                  />
+                </Bar>
+              )}
 
-            {/* Comparison region bar (only if compareWith is present) */}
-            {compareWith && (
-              <Bar name={`${name2} (heller)`} dataKey="percentage2" radius={[4, 4, 0, 0]}>
+              {/* Primary region bar - rendered second to overlay in the foreground */}
+              <Bar name={name1} dataKey="percentage1" radius={[4, 4, 0, 0]}>
                 {chartItems.map((entry, index) => (
                   <Cell
-                    key={`cell-2-${index}`}
+                    key={`cell-1-${index}`}
                     fill={entry.partyColor}
-                    fillOpacity={0.5}
+                    fillOpacity={1.0}
                   />
                 ))}
                 <LabelList
-                  dataKey="percentage2"
+                  dataKey="percentage1"
                   content={renderCustomLabel}
                 />
               </Bar>
-            )}
-          </BarChart>
-        </ResponsiveContainer>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
       </div>
 
       {/* Screen-reader accessible data table wrapped in a block container to prevent layout overflow */}

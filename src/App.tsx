@@ -24,9 +24,6 @@ export default function App() {
               Bundestagswahl 2025
             </h1>
           </div>
-          <div className="text-xs text-slate-500 font-medium bg-slate-100 px-2.5 py-1 rounded-full">
-            Datenquelle: Bundeswahlleiter-Ergebnisdateien
-          </div>
         </div>
       </header>
 

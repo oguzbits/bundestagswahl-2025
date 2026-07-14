@@ -187,22 +187,28 @@ export function MetadatenHeader({ gebiet, parentName }: MetadataHeaderProps) {
 
       {/* Main Stats */}
       <div className="p-6 space-y-6">
-        <div className="grid grid-cols-3 gap-3 text-center">
-          <div className="bg-slate-50 rounded-xl p-3 border border-slate-100 flex flex-col justify-center">
-            <div className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Wahlberechtigte</div>
-            <div className="text-sm sm:text-base font-extrabold text-slate-800 mt-1 font-mono">
+        <div className="grid grid-cols-3 gap-1.5 sm:gap-3 text-center">
+          <div className="bg-slate-50 rounded-xl p-2 sm:p-3 border border-slate-100 flex flex-col justify-center min-w-0">
+            <div className="text-[9px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider leading-tight">
+              <span className="hidden sm:inline">Wahlberechtigte</span>
+              <span className="sm:hidden">Wahl-<br/>berechtigte</span>
+            </div>
+            <div className="text-[11px] xs:text-xs sm:text-base font-extrabold text-slate-800 mt-0.5 sm:mt-1 font-mono truncate">
               {gebiet.wahlberechtigte.toLocaleString('de-DE')}
             </div>
           </div>
-          <div className="bg-slate-50 rounded-xl p-3 border border-slate-100 flex flex-col justify-center">
-            <div className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Wähler</div>
-            <div className="text-sm sm:text-base font-extrabold text-slate-800 mt-1 font-mono">
+          <div className="bg-slate-50 rounded-xl p-2 sm:p-3 border border-slate-100 flex flex-col justify-center min-w-0">
+            <div className="text-[9px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider leading-tight">Wähler</div>
+            <div className="text-[11px] xs:text-xs sm:text-base font-extrabold text-slate-800 mt-0.5 sm:mt-1 font-mono truncate">
               {gebiet.waehler.toLocaleString('de-DE')}
             </div>
           </div>
-          <div className="bg-indigo-50/50 rounded-xl p-3 border border-indigo-100 flex flex-col justify-center">
-            <div className="text-[10px] text-indigo-600 font-bold uppercase tracking-wider">Wahlbeteiligung</div>
-            <div className="text-base sm:text-lg font-black text-indigo-700 mt-0.5 font-mono">
+          <div className="bg-indigo-50/50 rounded-xl p-2 sm:p-3 border border-indigo-100 flex flex-col justify-center min-w-0">
+            <div className="text-[9px] sm:text-[10px] text-indigo-600 font-bold uppercase tracking-wider leading-tight">
+              <span className="hidden sm:inline">Wahlbeteiligung</span>
+              <span className="sm:hidden">Wahl-<br/>beteiligung</span>
+            </div>
+            <div className="text-[11px] xs:text-xs sm:text-base md:text-lg font-black text-indigo-700 mt-0.5 font-mono truncate">
               {gebiet.wahlbeteiligung.toFixed(2)}%
             </div>
           </div>

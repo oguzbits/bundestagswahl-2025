@@ -82,3 +82,16 @@ body,
   margin: 0;
   padding: 0;
 }
+
+/* Remove default focus outlines for Recharts elements */
+.recharts-wrapper,
+.recharts-wrapper *,
+.recharts-surface,
+.recharts-surface *,
+.recharts-wrapper:focus,
+.recharts-wrapper:active,
+.recharts-surface:focus,
+.recharts-surface:active {
+  outline: none !important;
+  box-shadow: none !important;
+}

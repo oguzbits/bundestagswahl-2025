@@ -189,7 +189,7 @@ describe('ElectionChart Component', () => {
     expect(sonstige.percentage2).toBe(expectedSonstige2);
   });
 
-  it('verifies that barGap={0} is set on BarChart', () => {
+  it('verifies that barGap={-10} is set on BarChart', () => {
     render(
       <ElectionChart
         data={mockGebiet1}
@@ -199,7 +199,7 @@ describe('ElectionChart Component', () => {
     );
 
     const chartEl = screen.getByTestId('bar-chart');
-    expect(chartEl.getAttribute('data-bargap')).toBe('0');
+    expect(chartEl.getAttribute('data-bargap')).toBe('-6');
   });
 
   it('verifies visual styling properties (legend suffix and opacity mapping)', () => {
@@ -217,20 +217,20 @@ describe('ElectionChart Component', () => {
     const bar1 = bars[0];
     const bar2 = bars[1];
 
-    // Bar 1 should represent Gebiet 1
-    expect(bar1.getAttribute('data-name')).toBe('Schleswig-Holstein');
-    expect(bar1.getAttribute('data-datakey')).toBe('percentage1');
+    // Bar 1 should represent Gebiet 2 with "(heller)" suffix (declared first in JSX)
+    expect(bar1.getAttribute('data-name')).toBe('Hamburg (heller)');
+    expect(bar1.getAttribute('data-datakey')).toBe('percentage2');
 
-    // Bar 2 should represent Gebiet 2 with "(heller)" suffix
-    expect(bar2.getAttribute('data-name')).toBe('Hamburg (heller)');
-    expect(bar2.getAttribute('data-datakey')).toBe('percentage2');
+    // Bar 2 should represent Gebiet 1 (declared second)
+    expect(bar2.getAttribute('data-name')).toBe('Schleswig-Holstein');
+    expect(bar2.getAttribute('data-datakey')).toBe('percentage1');
 
-    // Verify opacity: Cell 1 should have opacity 1.0, Cell 2 should have opacity 0.5
+    // Verify opacity: Cell 1 (comparison) should have opacity 0.4, Cell 4 (primary) should have opacity 1.0
     const cells = screen.getAllByTestId('cell');
-    // First 3 cells are for Bar 1 (SPD, CDU, Sonstige)
-    expect(cells[0].getAttribute('data-fillopacity')).toBe('1');
-    // Next 3 cells are for Bar 2 (SPD, CDU, Sonstige)
-    expect(cells[3].getAttribute('data-fillopacity')).toBe('0.5');
+    // First 3 cells are for Bar 1 (comparison: SPD, CDU, Sonstige)
+    expect(cells[0].getAttribute('data-fillopacity')).toBe('0.4');
+    // Next 3 cells are for Bar 2 (primary: SPD, CDU, Sonstige)
+    expect(cells[3].getAttribute('data-fillopacity')).toBe('1');
   });
 
   it('verifies Y-axis margins, domain, and tick formatter', () => {
@@ -243,11 +243,11 @@ describe('ElectionChart Component', () => {
 
     const chartEl = screen.getByTestId('bar-chart');
     const margin = JSON.parse(chartEl.getAttribute('data-margin') || '{}');
-    expect(margin.left).toBeGreaterThanOrEqual(20);
+    expect(margin.left).toBe(0);
 
     const yAxisEl = screen.getByTestId('y-axis');
-    expect(yAxisEl.getAttribute('data-domain')).toBe(JSON.stringify(['auto', 'auto']));
-    expect(yAxisEl.getAttribute('data-formatted-value-test')).toBe('32.0%');
+    expect(yAxisEl.getAttribute('data-domain')).toBe(JSON.stringify([0, 'auto']));
+    expect(yAxisEl.getAttribute('data-formatted-value-test')).toBe('32');
   });
 
   it('verifies persistent LabelList components and their formatters', () => {
@@ -262,16 +262,16 @@ describe('ElectionChart Component', () => {
     const labelLists = screen.getAllByTestId('label-list');
     expect(labelLists).toHaveLength(2);
 
-    expect(labelLists[0].getAttribute('data-datakey')).toBe('percentage1');
+    expect(labelLists[0].getAttribute('data-datakey')).toBe('percentage2');
     const textEl1 = labelLists[0].querySelector('text');
     expect(textEl1).toBeDefined();
-    expect(textEl1?.textContent).toBe('31.7%');
+    expect(textEl1?.textContent).toBe('31,7');
     expect(textEl1?.getAttribute('class')).toContain('hidden lg:block');
 
-    expect(labelLists[1].getAttribute('data-datakey')).toBe('percentage2');
+    expect(labelLists[1].getAttribute('data-datakey')).toBe('percentage1');
     const textEl2 = labelLists[1].querySelector('text');
     expect(textEl2).toBeDefined();
-    expect(textEl2?.textContent).toBe('31.7%');
+    expect(textEl2?.textContent).toBe('31,7');
     expect(textEl2?.getAttribute('class')).toContain('hidden lg:block');
   });
 
