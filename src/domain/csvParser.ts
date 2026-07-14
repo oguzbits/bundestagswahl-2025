@@ -160,7 +160,7 @@ export function parseElectionData(
     const gueltigeZweitstimmen2021 = parseSafeInt(parts[19]);
 
     // Party results
-    const parteien: ParteiErgebnis[] = [];
+    let rawParteien: ParteiErgebnis[] = [];
 
     for (const partyCol of partyColumns) {
       const zAbs = parseSafeInt(parts[partyCol.colIndex + 2]);
@@ -174,9 +174,7 @@ export function parseElectionData(
         ? roundToTwoDecimals((zAbs2021 / gueltigeZweitstimmen2021) * 100)
         : 0;
 
-      // Only include the party results if there were votes (absolut or absolut2021 > 0)
-      // or if it's one of the main parties, but including all active parties is safer.
-      parteien.push({
+      rawParteien.push({
         parteiKurz: partyCol.shortName,
         parteiLang: partyCol.longName,
         zweitstimmenAbsolut: zAbs,
@@ -185,6 +183,38 @@ export function parseElectionData(
         zweitstimmenRelativ2021: zRel2021,
       });
     }
+
+    // Consolidate CDU and CSU into CDU/CSU (Union)
+    const cduEntry = rawParteien.find((p) => p.parteiKurz.toUpperCase() === 'CDU');
+    const csuEntry = rawParteien.find((p) => p.parteiKurz.toUpperCase() === 'CSU');
+
+    const parteien: ParteiErgebnis[] = [];
+    if (cduEntry || csuEntry) {
+      const unionAbs = (cduEntry?.zweitstimmenAbsolut || 0) + (csuEntry?.zweitstimmenAbsolut || 0);
+      const unionAbs2021 = (cduEntry?.zweitstimmenAbsolut2021 || 0) + (csuEntry?.zweitstimmenAbsolut2021 || 0);
+      const unionRel = gueltigeZweitstimmen > 0
+        ? roundToTwoDecimals((unionAbs / gueltigeZweitstimmen) * 100)
+        : 0;
+      const unionRel2021 = gueltigeZweitstimmen2021 > 0
+        ? roundToTwoDecimals((unionAbs2021 / gueltigeZweitstimmen2021) * 100)
+        : 0;
+
+      parteien.push({
+        parteiKurz: 'CDU/CSU',
+        parteiLang: 'Christlich Demokratische Union / Christlich-Soziale Union',
+        zweitstimmenAbsolut: unionAbs,
+        zweitstimmenRelativ: unionRel,
+        zweitstimmenAbsolut2021: unionAbs2021,
+        zweitstimmenRelativ2021: unionRel2021,
+      });
+    }
+
+    rawParteien.forEach((p) => {
+      const nameUpper = p.parteiKurz.toUpperCase();
+      if (nameUpper !== 'CDU' && nameUpper !== 'CSU') {
+        parteien.push(p);
+      }
+    });
 
     // Sort descending by current relative percentage
     parteien.sort((a, b) => b.zweitstimmenRelativ - a.zweitstimmenRelativ);

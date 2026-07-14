@@ -107,7 +107,7 @@ Nr;Gebiet;gehört zu;Gewählt;Wahlberechtigte;;;;Wählende;;;;Ungültige Stimmen
     expect(bund.parteien[0].zweitstimmenRelativ).toBe(expectedGrueneRel);
     expect(bund.parteien[0].zweitstimmenRelativ2021).toBe(expectedGrueneRel2021);
 
-    expect(bund.parteien[1].parteiKurz).toBe('CDU');
+    expect(bund.parteien[1].parteiKurz).toBe('CDU/CSU');
     expect(bund.parteien[1].zweitstimmenRelativ).toBe(expectedCduRel);
     expect(bund.parteien[1].zweitstimmenRelativ2021).toBe(expectedCduRel2021);
 

@@ -37,15 +37,43 @@ export interface PartitionedParties {
   sortedAndFilteredMinorParties: ParteiErgebnis[];
 }
 
+export function consolidateUnion(parties: ParteiErgebnis[]): ParteiErgebnis[] {
+  const cdu = parties.find(p => p.parteiKurz.toUpperCase() === 'CDU');
+  const csu = parties.find(p => p.parteiKurz.toUpperCase() === 'CSU');
+  if (!cdu && !csu) return parties;
+
+  const unionAbs = (cdu?.zweitstimmenAbsolut || 0) + (csu?.zweitstimmenAbsolut || 0);
+  const unionAbs2021 = (cdu?.zweitstimmenAbsolut2021 || 0) + (csu?.zweitstimmenAbsolut2021 || 0);
+  const unionRel = Math.round(((cdu?.zweitstimmenRelativ || 0) + (csu?.zweitstimmenRelativ || 0)) * 100) / 100;
+  const unionRel2021 = Math.round(((cdu?.zweitstimmenRelativ2021 || 0) + (csu?.zweitstimmenRelativ2021 || 0)) * 100) / 100;
+
+  const merged: ParteiErgebnis = {
+    parteiKurz: 'CDU/CSU',
+    parteiLang: 'Christlich Demokratische Union / Christlich-Soziale Union',
+    zweitstimmenAbsolut: unionAbs,
+    zweitstimmenRelativ: unionRel,
+    zweitstimmenAbsolut2021: unionAbs2021,
+    zweitstimmenRelativ2021: unionRel2021,
+  };
+
+  const filtered = parties.filter(p => {
+    const nameUpper = p.parteiKurz.toUpperCase();
+    return nameUpper !== 'CDU' && nameUpper !== 'CSU';
+  });
+
+  return [merged, ...filtered];
+}
+
 /**
  * Partitions parties into primary (established or >= 3%) and minor parties,
  * aggregating minor parties into a virtual "Sonstige" row.
  */
 export function partitionParties(parties: ParteiErgebnis[]): PartitionedParties {
+  const consolidated = consolidateUnion(parties);
   const primaryParties: ParteiErgebnis[] = [];
   const minorParties: ParteiErgebnis[] = [];
 
-  parties.forEach((p) => {
+  consolidated.forEach((p) => {
     const isEstablished = ESTABLISHED_PARTIES.has(p.parteiKurz.toUpperCase()) || 
                           ESTABLISHED_PARTIES.has(p.parteiLang.toUpperCase());
     const isHighPerformer = p.zweitstimmenRelativ >= 3.0;

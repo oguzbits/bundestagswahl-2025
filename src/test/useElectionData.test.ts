@@ -71,7 +71,7 @@ WKR_NR;WKR_NAME;LAND_NR;LAND_NAME;LAND_ABK
     expect(bundesgebiet.wahlberechtigte).toBe(1000);
     expect(bundesgebiet.parteien).toHaveLength(3);
     expect(bundesgebiet.parteien[0].parteiKurz).toBe('GRÜNE');
-    expect(bundesgebiet.parteien[1].parteiKurz).toBe('CDU');
+    expect(bundesgebiet.parteien[1].parteiKurz).toBe('CDU/CSU');
     expect(bundesgebiet.parteien[2].parteiKurz).toBe('SPD');
   });
 
