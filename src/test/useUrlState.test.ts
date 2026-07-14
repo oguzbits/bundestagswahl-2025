@@ -20,8 +20,9 @@ describe('useUrlState Hook', () => {
     });
     
     vi.spyOn(window.history, 'pushState').mockImplementation((_state, _title, url) => {
-      const searchIndex = url.toString().indexOf('?');
-      mockLocation.search = searchIndex !== -1 ? url.toString().slice(searchIndex) : '';
+      const urlStr = url ? url.toString() : '';
+      const searchIndex = urlStr.indexOf('?');
+      mockLocation.search = searchIndex !== -1 ? urlStr.slice(searchIndex) : '';
     });
   });
 

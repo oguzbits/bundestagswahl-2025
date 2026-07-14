@@ -1,193 +1,202 @@
 import { useUrlState } from './hooks/useUrlState';
 import { useElectionData } from './hooks/useElectionData';
+import { Autocomplete } from './components/Autocomplete';
+import { MetadataHeader } from './components/MetadataHeader';
+import { ElectionChart } from './components/ElectionChart';
+import { X } from 'lucide-react';
 
-// Simple function to get a color class for popular parties to enrich aesthetics
-function getPartyColor(party: string): string {
-  const name = party.toUpperCase();
-  if (name.includes('SPD')) return '#e3000f';
-  if (name.includes('CDU') || name.includes('CSU')) return '#111111';
-  if (name.includes('GRÜNE') || name.includes('BÜNDNIS')) return '#46962b';
-  if (name.includes('FDP')) return '#ffed00';
-  if (name.includes('AFD')) return '#009ee0';
-  if (name.includes('LINKE')) return '#be3075';
-  if (name.includes('BSW')) return '#a22c54';
-  return '#6b7280';
-}
+export default function App() {
+  const { gebiet1Id, gebiet2Id, setGebiet1Id, setGebiet2Id, clearSelection } = useUrlState();
+  const { data, isLoading, error, searchOptions } = useElectionData();
 
-function App() {
-  const { gebiet1Id, setGebiet1Id, clearSelection } = useUrlState();
-  const { data, isLoading, error } = useElectionData();
-
-  const selectedGebiet = gebiet1Id && data ? data[gebiet1Id] : null;
+  // Find the selected Gebiet in our map
+  const selectedGebiet1 = gebiet1Id && data ? data[gebiet1Id] : null;
+  const selectedGebiet2 = gebiet2Id && data ? data[gebiet2Id] : null;
 
   return (
-    <div className="min-h-screen bg-slate-50/50 dark:bg-zinc-950 py-12 px-4 sm:px-6 lg:px-8 font-sans">
-      <div className="max-w-3xl mx-auto">
-        {/* Header */}
-        <header className="flex flex-col items-center justify-center text-center mb-10">
-          <div className="inline-flex items-center justify-center space-x-2 bg-amber-500/10 text-amber-700 dark:text-amber-400 px-3 py-1 rounded-full text-xs font-semibold tracking-wider uppercase mb-3 border border-amber-500/20">
-            🇩🇪 Amtliche Daten
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans antialiased">
+      {/* Header */}
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <span className="text-2xl" role="img" aria-label="German Flag">🇩🇪</span>
+            <h1 className="text-xl font-bold tracking-tight text-slate-900">
+              Bundestagswahl 2025
+            </h1>
           </div>
-          <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 dark:text-zinc-50 tracking-tight !my-2">
-            Bundestagswahl 2025
-          </h1>
-          <p className="text-sm sm:text-base text-slate-500 dark:text-zinc-400 max-w-md">
-            Ergebnisse und Analysen im detaillierten Wahl-Explorer
-          </p>
-        </header>
+          <div className="text-xs text-slate-500 font-medium bg-slate-100 px-2.5 py-1 rounded-full">
+            Datenquelle: Bundeswahlleiter-Ergebnisdateien
+          </div>
+        </div>
+      </header>
 
-        {/* Main Content Area */}
-        <main className="bg-white dark:bg-zinc-900/40 rounded-2xl border border-slate-200/80 dark:border-zinc-800/80 shadow-sm p-6 sm:p-8 backdrop-blur-sm transition-all">
-          {isLoading && (
-            <div className="flex flex-col items-center justify-center py-16 space-y-4" role="status">
-              <div className="w-12 h-12 border-4 border-slate-200 dark:border-zinc-850 border-t-amber-500 rounded-full animate-spin"></div>
-              <p className="text-sm font-medium text-slate-500 dark:text-zinc-400">Daten werden geladen...</p>
+      {/* Main Content Area */}
+      <main className="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
+        {/* Loading State */}
+        {isLoading && (
+          <div className="flex flex-col items-center justify-center py-20 space-y-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+            <p className="text-slate-600 font-medium">Wahldaten werden verarbeitet und Ergebnisse geladen...</p>
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && (
+          <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-md my-4">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <span className="text-red-500 text-xl font-bold">⚠️</span>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-bold text-red-800">Fehler beim Laden der Daten</h3>
+                <p className="text-sm text-red-700 mt-1">{error.message}</p>
+              </div>
             </div>
-          )}
+          </div>
+        )}
 
-          {error && (
-            <div className="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/50 rounded-xl p-4 text-center" role="alert">
-              <span className="block text-2xl mb-1">⚠️</span>
-              <p className="text-sm font-semibold text-red-800 dark:text-red-400">{error.message || 'Fehler beim Laden der Wahldaten'}</p>
-            </div>
-          )}
-
-          {!isLoading && !error && (
-            <>
-              {!gebiet1Id ? (
-                /* Empty State */
-                <div className="flex flex-col items-center justify-center text-center py-12 px-4 border border-dashed border-slate-200 dark:border-zinc-800 rounded-xl">
-                  <div className="text-4xl mb-4">🔍</div>
-                  <h3 className="text-lg font-semibold text-slate-800 dark:text-zinc-200 mb-2">
-                    Kein Gebiet ausgewählt
-                  </h3>
-                  <p className="text-sm text-slate-500 dark:text-zinc-400 max-w-sm mb-6">
-                    Bitte wählen Sie ein Gebiet aus oder hängen Sie <code className="text-amber-600 dark:text-amber-400 font-mono bg-slate-100 dark:bg-zinc-800 px-1 py-0.5 rounded">?gebiet1=99</code> an die URL an.
-                  </p>
-                  <div className="flex flex-wrap gap-3 justify-center">
-                    <button
-                      onClick={() => setGebiet1Id('99')}
-                      className="px-4 py-2 text-sm font-medium text-white bg-slate-900 dark:bg-zinc-100 dark:text-zinc-900 hover:bg-slate-800 dark:hover:bg-zinc-200 rounded-lg shadow-sm transition"
-                    >
-                      Bund (Gesamt) anzeigen
-                    </button>
-                    <button
-                      onClick={() => setGebiet1Id('11')}
-                      className="px-4 py-2 text-sm font-medium text-slate-750 bg-slate-100 dark:bg-zinc-800 dark:text-zinc-200 hover:bg-slate-200 dark:hover:bg-zinc-700 rounded-lg transition"
-                    >
-                      Berlin anzeigen
-                    </button>
-                  </div>
+        {/* Loaded Content */}
+        {!isLoading && !error && (
+          <div className="space-y-8">
+            {/* Search Controls Card */}
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                <div>
+                  <h2 className="text-lg font-bold text-slate-800">Region für Analyse auswählen</h2>
+                  <p className="text-xs text-slate-500 mt-0.5">Ergebnisse auf Bundes-, Landes- oder Wahlkreisebene erkunden</p>
                 </div>
-              ) : selectedGebiet ? (
-                /* Gebiet Details Card */
-                <div className="space-y-6 animate-in fade-in duration-300">
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 dark:border-zinc-850 pb-5 gap-4">
-                    <div>
-                      <span className="inline-flex items-center text-xs font-semibold px-2 py-0.5 rounded bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 mb-1">
-                        {selectedGebiet.typ === 'Bund' ? 'Gesamtgebiet' : selectedGebiet.typ === 'Land' ? 'Bundesland' : 'Wahlkreis'} (ID: {selectedGebiet.id})
-                      </span>
-                      <h2 className="text-2xl font-bold text-slate-900 dark:text-zinc-50 !m-0">
-                        {selectedGebiet.name}
-                      </h2>
-                    </div>
-                    <button
-                      onClick={clearSelection}
-                      className="text-xs font-medium text-slate-500 hover:text-slate-750 dark:hover:text-zinc-300 bg-slate-50 dark:bg-zinc-850 border border-slate-200 dark:border-zinc-800 px-3 py-1.5 rounded-lg transition self-start sm:self-center"
-                    >
-                      Auswahl aufheben
-                    </button>
-                  </div>
-
-                  {/* Metadata Header Stats */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="bg-slate-50 dark:bg-zinc-900 border border-slate-100 dark:border-zinc-850 rounded-xl p-4">
-                      <p className="text-xs text-slate-500 dark:text-zinc-400 font-medium uppercase tracking-wider mb-1">Wahlbeteiligung 2025</p>
-                      <div className="flex items-baseline space-x-2">
-                        <span className="text-3xl font-extrabold text-slate-900 dark:text-zinc-50">{selectedGebiet.wahlbeteiligung}%</span>
-                        <span className="text-xs text-slate-400 dark:text-zinc-500">({selectedGebiet.waehler.toLocaleString('de-DE')} Wähler)</span>
-                      </div>
-                    </div>
-
-                    <div className="bg-slate-50 dark:bg-zinc-900 border border-slate-100 dark:border-zinc-850 rounded-xl p-4">
-                      <p className="text-xs text-slate-500 dark:text-zinc-400 font-medium uppercase tracking-wider mb-1">Wahlbeteiligung 2021</p>
-                      <div className="flex items-baseline space-x-2">
-                        <span className="text-3xl font-extrabold text-slate-500 dark:text-zinc-400">{selectedGebiet.wahlbeteiligung2021}%</span>
-                        {selectedGebiet.wahlbeteiligung !== selectedGebiet.wahlbeteiligung2021 && (
-                          <span className={`text-xs font-semibold ${selectedGebiet.wahlbeteiligung > selectedGebiet.wahlbeteiligung2021 ? 'text-emerald-600' : 'text-rose-600'}`}>
-                            {selectedGebiet.wahlbeteiligung > selectedGebiet.wahlbeteiligung2021 ? '▲' : '▼'} {(selectedGebiet.wahlbeteiligung - selectedGebiet.wahlbeteiligung2021).toFixed(1)}%
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Top Parties List */}
-                  <div>
-                    <h3 className="text-sm font-semibold text-slate-500 dark:text-zinc-450 uppercase tracking-wider mb-3">Stärkste Kräfte (Zweitstimmen)</h3>
-                    <div className="space-y-4">
-                      {selectedGebiet.parteien.slice(0, 3).map((partei) => (
-                        <div key={partei.parteiKurz} className="relative bg-slate-50 dark:bg-zinc-900/60 p-4 rounded-xl border border-slate-100 dark:border-zinc-850">
-                          <div className="flex justify-between items-start mb-2">
-                            <div>
-                              <span className="text-base font-bold text-slate-900 dark:text-zinc-50">{partei.parteiKurz}</span>
-                              <span className="text-xs text-slate-500 dark:text-zinc-400 ml-2 font-normal hidden sm:inline">{partei.parteiLang}</span>
-                            </div>
-                            <div className="text-right">
-                              <span className="text-lg font-extrabold text-slate-900 dark:text-zinc-50">{partei.zweitstimmenRelativ}%</span>
-                              <span className="block text-xs text-slate-400 dark:text-zinc-500">{partei.zweitstimmenAbsolut.toLocaleString('de-DE')} Stimmen</span>
-                            </div>
-                          </div>
-
-                          {/* Beautiful custom styled bar representing the vote share */}
-                          <div className="w-full bg-slate-200 dark:bg-zinc-800 h-2 rounded-full overflow-hidden">
-                            <div
-                              className="h-full rounded-full transition-all duration-500"
-                              style={{
-                                width: `${partei.zweitstimmenRelativ}%`,
-                                backgroundColor: getPartyColor(partei.parteiKurz)
-                              }}
-                            />
-                          </div>
-
-                          {/* 2021 comparison line */}
-                          {partei.zweitstimmenRelativ2021 > 0 && (
-                            <div className="flex justify-between items-center mt-2 text-xs text-slate-500 dark:text-zinc-450">
-                              <span>Ergebnis 2021: {partei.zweitstimmenRelativ2021}%</span>
-                              <span className={partei.zweitstimmenRelativ > partei.zweitstimmenRelativ2021 ? 'text-emerald-600' : 'text-rose-600'}>
-                                {partei.zweitstimmenRelativ > partei.zweitstimmenRelativ2021 ? '+' : ''}{(partei.zweitstimmenRelativ - partei.zweitstimmenRelativ2021).toFixed(1)}%
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                /* Not Found state if gebiet1Id is present but not in WahlDatenMap */
-                <div className="text-center py-12 px-4 border border-dashed border-red-200 dark:border-red-900/30 rounded-xl">
-                  <div className="text-4xl mb-4">❓</div>
-                  <h3 className="text-lg font-semibold text-slate-800 dark:text-zinc-200 mb-2">
-                    Gebiet nicht gefunden
-                  </h3>
-                  <p className="text-sm text-slate-500 dark:text-zinc-400 mb-6">
-                    Die Gebiets-ID <code className="text-rose-600 dark:text-rose-450 font-mono bg-red-50 dark:bg-red-950/20 px-1 py-0.5 rounded">"{gebiet1Id}"</code> konnte in den Wahldaten nicht gefunden werden.
-                  </p>
+                {(gebiet1Id || gebiet2Id) && (
                   <button
                     onClick={clearSelection}
-                    className="px-4 py-2 text-sm font-medium text-white bg-slate-900 dark:bg-zinc-100 dark:text-zinc-900 hover:bg-slate-800 dark:hover:bg-zinc-200 rounded-lg shadow-sm transition"
+                    className="self-start md:self-auto px-4 py-2 text-xs font-bold bg-red-50 text-red-700 hover:bg-red-100 rounded-xl transition-all border border-red-100 flex items-center gap-1.5"
                   >
-                    Zurück zur Auswahl
+                    <X className="h-3.5 w-3.5" /> Alle Auswahlen aufheben
                   </button>
+                )}
+              </div>
+
+              {/* 2-Column Autocomplete Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Column 1 Autocomplete */}
+                <div className="space-y-4">
+                  <Autocomplete
+                    options={searchOptions}
+                    selectedId={gebiet1Id}
+                    onSelect={setGebiet1Id}
+                    placeholder="Suchen Sie nach einem Wahlkreis, Land oder dem Bund..."
+                    label="Primäre Region"
+                  />
                 </div>
-              )}
-            </>
-          )}
-        </main>
-      </div>
+
+                {/* Column 2 Autocomplete (Only if gebiet1 is selected) */}
+                <div className="space-y-4">
+                  {gebiet1Id ? (
+                    <Autocomplete
+                      options={searchOptions}
+                      selectedId={gebiet2Id}
+                      onSelect={setGebiet2Id}
+                      placeholder="Vergleichsregion suchen..."
+                      label="Vergleichsregion (Optional)"
+                    />
+                  ) : (
+                    <div className="h-full flex items-end">
+                      <div className="text-sm text-slate-400 italic bg-slate-50 border border-dashed border-slate-200 rounded-xl p-4 w-full">
+                        Bitte wählen Sie zuerst eine primäre Region aus, um den Vergleich zu aktivieren.
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Display Selected Gebiet & Comparison Side-by-Side */}
+            {(selectedGebiet1 || selectedGebiet2) ? (
+              <div className="space-y-8">
+                {selectedGebiet1 && !selectedGebiet2 ? (
+                  /* CASE 1: Only gebiet1 is selected */
+                  <div className="space-y-6 max-w-4xl mx-auto">
+                    <MetadataHeader
+                      gebiet={selectedGebiet1}
+                      parentName={
+                        selectedGebiet1.typ === 'Wahlkreis' && selectedGebiet1.uebergeordnetesGebietId && data
+                          ? data[selectedGebiet1.uebergeordnetesGebietId]?.name
+                          : null
+                      }
+                    />
+                    <ElectionChart
+                      data={selectedGebiet1}
+                      title={`Wahlergebnis: ${selectedGebiet1.name}`}
+                    />
+                  </div>
+                ) : selectedGebiet1 && selectedGebiet2 ? (
+                  /* CASE 2: Both gebiet1 and gebiet2 are selected */
+                  <div className="space-y-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      {/* Column 1: Primary Region */}
+                      <div className="space-y-6">
+                        <MetadataHeader
+                          gebiet={selectedGebiet1}
+                          parentName={
+                            selectedGebiet1.typ === 'Wahlkreis' && selectedGebiet1.uebergeordnetesGebietId && data
+                              ? data[selectedGebiet1.uebergeordnetesGebietId]?.name
+                              : null
+                          }
+                        />
+                        <ElectionChart
+                          data={selectedGebiet1}
+                          title={`Wahlergebnis: ${selectedGebiet1.name}`}
+                        />
+                      </div>
+
+                      {/* Column 2: Comparison Region */}
+                      <div className="space-y-6">
+                        <MetadataHeader
+                          gebiet={selectedGebiet2}
+                          parentName={
+                            selectedGebiet2.typ === 'Wahlkreis' && selectedGebiet2.uebergeordnetesGebietId && data
+                              ? data[selectedGebiet2.uebergeordnetesGebietId]?.name
+                              : null
+                          }
+                        />
+                        <ElectionChart
+                          data={selectedGebiet2}
+                          title={`Wahlergebnis: ${selectedGebiet2.name}`}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Combined comparison card */}
+                    <div className="border-t border-slate-200 pt-8">
+                      <ElectionChart
+                        data={selectedGebiet1}
+                        compareWith={selectedGebiet2}
+                        title={`Vergleich: ${selectedGebiet1.name} vs. ${selectedGebiet2.name}`}
+                      />
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+            ) : (
+              /* Fallback message if neither is selected */
+              <div className="bg-white rounded-2xl shadow-sm border border-slate-200 max-w-2xl mx-auto py-16 px-8 text-center flex flex-col items-center">
+                <div className="bg-indigo-50 text-indigo-600 rounded-full p-4 mb-4 text-4xl shadow-sm">
+                  🔍
+                </div>
+                <h3 className="text-xl font-black text-slate-800">Keine Wahlregion ausgewählt</h3>
+                <p className="text-sm text-slate-500 mt-2.5 max-w-md leading-relaxed">
+                  Wählen Sie oben über das Suchfeld einen Wahlkreis, ein Bundesland oder das gesamte Bundesgebiet aus, um die Wahlbeteiligung und die Zweitstimmenverteilung anzuzeigen.
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+      </main>
+
+      <footer className="py-4 bg-slate-100/50 text-xs text-muted-foreground border-t border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-slate-500">
+          © 2025 Bundestagswahl. Alle Rechte vorbehalten. | Datenquelle: Bundeswahlleiter-Ergebnisdateien
+        </div>
+      </footer>
     </div>
   );
 }
-
-export default App;

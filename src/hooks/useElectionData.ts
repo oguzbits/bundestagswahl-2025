@@ -1,6 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import type { WahlDatenMap } from '../domain/types';
 import { parseElectionData } from '../domain/csvParser';
+
+export interface SearchOption {
+  id: string;
+  name: string;
+  type: 'Bund' | 'Land' | 'Wahlkreis';
+  parentName: string | null;
+}
 
 export function useElectionData() {
   const [data, setData] = useState<WahlDatenMap | null>(null);
@@ -51,9 +58,49 @@ export function useElectionData() {
     };
   }, []);
 
+  const searchOptions = useMemo<SearchOption[]>(() => {
+    if (!data) return [];
+
+    const options: SearchOption[] = Object.values(data).map((gebiet) => {
+      let parentName: string | null = null;
+      if (gebiet.typ === 'Wahlkreis' && gebiet.uebergeordnetesGebietId) {
+        const parent = data[gebiet.uebergeordnetesGebietId];
+        parentName = parent ? parent.name : null;
+      }
+      return {
+        id: gebiet.id,
+        name: gebiet.name,
+        type: gebiet.typ,
+        parentName,
+      };
+    });
+
+    options.sort((a, b) => {
+      if (a.id === '99') return -1;
+      if (b.id === '99') return 1;
+
+      if (a.type === 'Land' && b.type !== 'Land') return -1;
+      if (b.type === 'Land' && a.type !== 'Land') return 1;
+      if (a.type === 'Land' && b.type === 'Land') {
+        return a.name.localeCompare(b.name, 'de');
+      }
+
+      const parentA = a.parentName || '';
+      const parentB = b.parentName || '';
+      if (parentA !== parentB) {
+        return parentA.localeCompare(parentB, 'de');
+      }
+      return a.name.localeCompare(b.name, 'de');
+    });
+
+    return options;
+  }, [data]);
+
   return {
     data,
+    searchOptions,
     isLoading,
     error,
   };
 }
+
