@@ -253,7 +253,7 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
       </div>
 
       <div className="w-full relative">
-        <div className="h-[360px] sm:h-[420px] w-full relative">
+        <div className="h-[360px] sm:h-[420px] w-full relative" aria-hidden="true">
           <ChartContainer config={chartConfig} className="h-full w-full aspect-auto">
             <BarChart
               key={isMobile ? 'mobile' : 'desktop'}
@@ -267,7 +267,7 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
                 dataKey="party"
                 tickLine={false}
                 axisLine={false}
-                stroke="#64748b"
+                stroke="#475569"
                 fontSize={11}
                 fontWeight={600}
                 angle={isMobile ? -45 : 0}
@@ -278,7 +278,7 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
                 width={35}
                 tickLine={false}
                 axisLine={false}
-                stroke="#64748b"
+                stroke="#475569"
                 fontSize={11}
                 domain={[0, 'auto']}
                 tickFormatter={(value) => `${Math.floor(value)}`}
