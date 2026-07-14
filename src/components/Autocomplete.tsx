@@ -56,52 +56,54 @@ export function Autocomplete({
       </label>
 
       <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger
-          id={triggerId}
-          role="combobox"
-          aria-expanded={open}
-          aria-haspopup="listbox"
-          aria-label={label}
-          className={cn(
-            'flex h-11 w-full items-center justify-between rounded-xl border border-slate-200 bg-white pl-4 pr-16 py-2.5 text-sm shadow-sm transition-all text-left',
-            'hover:bg-slate-50 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500',
-            !selectedOption && 'text-slate-400',
-          )}
-        >
-          <span className="truncate flex-1 font-medium">
-            {selectedOption ? (
-              <span className="text-slate-900 flex items-center gap-2 min-w-0">
-                <span
-                  className={cn(
-                    'text-[10px] font-bold px-1.5 py-0.5 rounded-md uppercase tracking-wider border shrink-0',
-                    selectedOption.type === 'Bund' && 'bg-slate-900 text-white border-slate-900',
-                    selectedOption.type === 'Land' &&
-                      'bg-indigo-50 text-indigo-700 border-indigo-100',
-                    selectedOption.type === 'Wahlkreis' &&
-                      'bg-slate-100 text-slate-600 border-slate-200',
-                  )}
-                >
-                  {selectedOption.type}
-                </span>
-                <span className="truncate">{selectedOption.name}</span>
-              </span>
-            ) : (
-              placeholder
+        <div className="relative w-full">
+          <PopoverTrigger
+            id={triggerId}
+            role="combobox"
+            aria-expanded={open}
+            aria-haspopup="listbox"
+            aria-label={label}
+            className={cn(
+              'flex h-11 w-full items-center justify-between rounded-xl border border-slate-200 bg-white pl-4 pr-16 py-2.5 text-sm shadow-sm transition-all text-left relative',
+              'hover:bg-slate-50 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500',
+              !selectedOption && 'text-slate-400',
             )}
-          </span>
-          <ChevronsUpDown className="h-4 w-4 text-slate-400 absolute right-4 bottom-[14px] pointer-events-none" />
-        </PopoverTrigger>
-
-        {selectedOption && (
-          <button
-            type="button"
-            onClick={handleClear}
-            aria-label="Auswahl aufheben"
-            className="absolute right-10 bottom-[8px] rounded-full p-1 hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 z-10"
           >
-            <X className="h-4 w-4" />
-          </button>
-        )}
+            <span className="truncate flex-1 font-medium">
+              {selectedOption ? (
+                <span className="text-slate-900 flex items-center gap-2 min-w-0">
+                  <span
+                    className={cn(
+                      'text-[10px] font-bold px-1.5 py-0.5 rounded-md uppercase tracking-wider border shrink-0',
+                      selectedOption.type === 'Bund' && 'bg-slate-900 text-white border-slate-900',
+                      selectedOption.type === 'Land' &&
+                        'bg-indigo-50 text-indigo-700 border-indigo-100',
+                      selectedOption.type === 'Wahlkreis' &&
+                        'bg-slate-100 text-slate-600 border-slate-200',
+                    )}
+                  >
+                    {selectedOption.type}
+                  </span>
+                  <span className="truncate">{selectedOption.name}</span>
+                </span>
+              ) : (
+                placeholder
+              )}
+            </span>
+            <ChevronsUpDown className="h-4 w-4 text-slate-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+          </PopoverTrigger>
+
+          {selectedOption && (
+            <button
+              type="button"
+              onClick={handleClear}
+              aria-label="Auswahl aufheben"
+              className="absolute right-10 top-1/2 -translate-y-1/2 rounded-full p-1 hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 z-10"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
+        </div>
         <PopoverContent
           className="p-0 w-[var(--anchor-width)] max-w-[calc(100vw-2rem)] overflow-hidden shadow-xl border border-slate-200 rounded-xl bg-white"
           align="start"
