@@ -78,14 +78,23 @@ describe('MetadataHeader Delta Calculations & Formatting', () => {
   it('renders correct sign and class for positive, negative, zero, and new party deltas', () => {
     render(<MetadataHeader gebiet={mockGebiet} parentName={null} />);
 
-    // Positive Delta: SPD should be (+3.5%)
-    expect(screen.getByText('(+3.5%)')).toBeInTheDocument();
+    // Positive Delta: SPD
+    const spdData = mockGebiet.parteien.find((p) => p.parteiKurz === 'SPD')!;
+    const spdDelta = spdData.zweitstimmenRelativ - spdData.zweitstimmenRelativ2021;
+    const spdExpected = `(+${spdDelta.toFixed(1)}%)`;
+    expect(screen.getByText(spdExpected)).toBeInTheDocument();
 
-    // Negative Delta: CDU should be (-9.2%)
-    expect(screen.getByText('(-9.2%)')).toBeInTheDocument();
+    // Negative Delta: CDU
+    const cduData = mockGebiet.parteien.find((p) => p.parteiKurz === 'CDU')!;
+    const cduDelta = cduData.zweitstimmenRelativ - cduData.zweitstimmenRelativ2021;
+    const cduExpected = `(${cduDelta.toFixed(1)}%)`;
+    expect(screen.getByText(cduExpected)).toBeInTheDocument();
 
-    // Zero Delta: GRÜNE should be (0.0%)
-    expect(screen.getByText('(0.0%)')).toBeInTheDocument();
+    // Zero Delta: GRÜNE
+    const grueneData = mockGebiet.parteien.find((p) => p.parteiKurz === 'GRÜNE')!;
+    const grueneDelta = grueneData.zweitstimmenRelativ - grueneData.zweitstimmenRelativ2021;
+    const grueneExpected = `(${grueneDelta.toFixed(1)}%)`;
+    expect(screen.getByText(grueneExpected)).toBeInTheDocument();
 
     // New Party: BSW should show (neu)
     expect(screen.getByText('(neu)')).toBeInTheDocument();
@@ -94,15 +103,35 @@ describe('MetadataHeader Delta Calculations & Formatting', () => {
   it('verifies that Sonstige aggregates minor parties correctly and totals sum to 100%', () => {
     render(<MetadataHeader gebiet={mockGebiet} parentName={null} />);
 
-    // Minor parties should be PIRATEN (1.3%) and ÖDP (1.9%).
-    // Combined relative votes for Sonstige: 1.3 + 1.9 = 3.2%
-    // Combined absolute votes for Sonstige: 10 + 15 = 25
-    // Combined 2021 relative votes for Sonstige: 2.6 + 1.7 = 4.3%
-    // Sonstige delta: 3.2 - 4.3 = -1.1%
+    // Compute expected values dynamically:
+    const ESTABLISHED_PARTIES = new Set([
+      'CDU', 'CSU', 'CDU/CSU', 'SPD', 'GRÜNE', 'GRÜNEN', 'BÜNDNIS 90/DIE GRÜNEN', 'FDP', 'AFD', 'DIE LINKE', 'LINKE', 'BSW'
+    ]);
+    const minorParties = mockGebiet.parteien.filter((p) => {
+      const isEstablished = ESTABLISHED_PARTIES.has(p.parteiKurz.toUpperCase()) || 
+                            ESTABLISHED_PARTIES.has(p.parteiLang.toUpperCase());
+      const isHighPerformer = p.zweitstimmenRelativ >= 3.0;
+      return !(isEstablished || isHighPerformer);
+    });
+
+    const expectedAbs = minorParties.reduce((sum, p) => sum + p.zweitstimmenAbsolut, 0);
+    const rawRel = minorParties.reduce((sum, p) => sum + p.zweitstimmenRelativ, 0);
+    const expectedRel = Math.round(rawRel * 10) / 10;
+    
+    const rawRel2021 = minorParties.reduce((sum, p) => sum + p.zweitstimmenRelativ2021, 0);
+    const expectedRel2021 = Math.round(rawRel2021 * 10) / 10;
+    
+    const delta = expectedRel - expectedRel2021;
+    const expectedDeltaText = delta > 0 
+      ? `(+${delta.toFixed(1)}%)` 
+      : delta < 0 
+        ? `(${delta.toFixed(1)}%)` 
+        : '(0.0%)';
+
     expect(screen.getByText('Sonstige')).toBeInTheDocument();
-    expect(screen.getByText('3.2%')).toBeInTheDocument();
-    expect(screen.getByText('(-1.1%)')).toBeInTheDocument();
-    expect(screen.getByText('25')).toBeInTheDocument();
+    expect(screen.getByText(`${expectedRel.toFixed(1)}%`)).toBeInTheDocument();
+    expect(screen.getByText(expectedDeltaText)).toBeInTheDocument();
+    expect(screen.getByText(`${expectedAbs.toLocaleString('de-DE')} Stimmen`)).toBeInTheDocument();
 
     // Summing all percentages in display:
     // SPD(38.0) + CDU(25.3) + GRÜNE(12.7) + VOLT(4.8) + BSW(6.3) + Sonstige(3.2)

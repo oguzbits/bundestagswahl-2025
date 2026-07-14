@@ -75,10 +75,12 @@ Nr;Gebiet;gehört zu;Gewählt;Wahlberechtigte;;;;Wählende;;;;Ungültige Stimmen
     const results = parseElectionData(mockKergCsv, mockParteienCsv, mockWahlkreiseCsv);
     const bund = results['99'];
 
-    // 800 / 1000 * 100 = 80.0
-    expect(bund.wahlbeteiligung).toBe(80.0);
-    // 600 / 800 * 100 = 75.0
-    expect(bund.wahlbeteiligung2021).toBe(75.0);
+    // Dynamically calculate from mock data: 800 Wähler / 1000 Wahlberechtigte * 100 = 80.0
+    const expectedTurnout = (800 / 1000) * 100;
+    const expectedTurnout2021 = (600 / 800) * 100;
+
+    expect(bund.wahlbeteiligung).toBe(expectedTurnout);
+    expect(bund.wahlbeteiligung2021).toBe(expectedTurnout2021);
   });
 
   it('calculates party relative percentages correctly and sorts them descending', () => {
@@ -86,21 +88,32 @@ Nr;Gebiet;gehört zu;Gewählt;Wahlberechtigte;;;;Wählende;;;;Ungültige Stimmen
     const bund = results['99'];
 
     // Valid second votes: 990 (current), 580 (2021)
-    // SPD: 200 (current), 150 (2021) -> 20.2%, 25.9%
-    // CDU: 300 (current), 200 (2021) -> 30.3%, 34.5%
-    // GRÜNE: 490 (current), 230 (2021) -> 49.5%, 39.7%
+    // SPD: 200 (current), 150 (2021)
+    // CDU: 300 (current), 200 (2021)
+    // GRÜNE: 490 (current), 230 (2021)
+    const totalGueltige = 990;
+    const totalGueltige2021 = 580;
+
+    const expectedGrueneRel = Math.round((490 / totalGueltige) * 100 * 10) / 10;
+    const expectedGrueneRel2021 = Math.round((230 / totalGueltige2021) * 100 * 10) / 10;
+
+    const expectedCduRel = Math.round((300 / totalGueltige) * 100 * 10) / 10;
+    const expectedCduRel2021 = Math.round((200 / totalGueltige2021) * 100 * 10) / 10;
+
+    const expectedSpdRel = Math.round((200 / totalGueltige) * 100 * 10) / 10;
+    const expectedSpdRel2021 = Math.round((150 / totalGueltige2021) * 100 * 10) / 10;
 
     expect(bund.parteien[0].parteiKurz).toBe('GRÜNE');
-    expect(bund.parteien[0].zweitstimmenRelativ).toBe(49.5);
-    expect(bund.parteien[0].zweitstimmenRelativ2021).toBe(39.7);
+    expect(bund.parteien[0].zweitstimmenRelativ).toBe(expectedGrueneRel);
+    expect(bund.parteien[0].zweitstimmenRelativ2021).toBe(expectedGrueneRel2021);
 
     expect(bund.parteien[1].parteiKurz).toBe('CDU');
-    expect(bund.parteien[1].zweitstimmenRelativ).toBe(30.3);
-    expect(bund.parteien[1].zweitstimmenRelativ2021).toBe(34.5);
+    expect(bund.parteien[1].zweitstimmenRelativ).toBe(expectedCduRel);
+    expect(bund.parteien[1].zweitstimmenRelativ2021).toBe(expectedCduRel2021);
 
     expect(bund.parteien[2].parteiKurz).toBe('SPD');
-    expect(bund.parteien[2].zweitstimmenRelativ).toBe(20.2);
-    expect(bund.parteien[2].zweitstimmenRelativ2021).toBe(25.9);
+    expect(bund.parteien[2].zweitstimmenRelativ).toBe(expectedSpdRel);
+    expect(bund.parteien[2].zweitstimmenRelativ2021).toBe(expectedSpdRel2021);
   });
 
   it('falls back safely when division by zero occurs or values are missing', () => {

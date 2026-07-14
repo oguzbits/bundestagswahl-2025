@@ -167,31 +167,42 @@ export function MetadatenHeader({ gebiet, parentName }: MetadataHeaderProps) {
               const partyColor = getPartyColor(p.parteiKurz);
               
               return (
-                <div key={p.parteiKurz} className="group p-2.5 rounded-xl hover:bg-slate-50 transition-all border border-transparent hover:border-slate-100">
-                  <div className="flex justify-between items-center text-xs sm:text-sm font-semibold">
-                    <span className="flex items-center space-x-2 truncate mr-4">
+                <div key={p.parteiKurz} className="group p-2.5 rounded-xl hover:bg-slate-50 transition-all border border-transparent hover:border-slate-100 flex flex-col space-y-1.5">
+                  {/* LINE 1 */}
+                  <div className="flex justify-between items-center">
+                    {/* Left: Colored dot + Party short name in bold */}
+                    <div className="flex items-center space-x-2">
                       <span 
                         className="w-3 h-3 rounded-full shrink-0 border border-black/10 shadow-sm"
                         style={{ backgroundColor: partyColor }}
                       />
-                      <span className="font-bold text-slate-800 text-sm">{p.parteiKurz}</span>
-                      <span className="text-xs text-slate-400 font-normal truncate hidden sm:inline" title={p.parteiLang}>
-                        {p.parteiLang}
-                      </span>
-                    </span>
-                    <div className="flex items-center space-x-2 shrink-0">
-                      <span className="text-slate-900 font-black text-sm font-mono">
+                      <span className="font-semibold text-sm text-slate-800">{p.parteiKurz}</span>
+                    </div>
+                    {/* Right: Current relative percentage (bold) + its dynamic 2021 delta in parentheses */}
+                    <div className="flex items-center space-x-1.5 font-mono">
+                      <span className="font-bold text-sm text-slate-900">
                         {p.zweitstimmenRelativ.toFixed(1)}%
                       </span>
-                      <span className={cn("text-xs font-semibold font-mono", deltaInfo.className)}>
+                      <span className={cn("text-xs font-semibold", deltaInfo.className)}>
                         ({deltaInfo.text})
-                      </span>
-                      <span className="text-[11px] text-slate-500 font-normal font-mono">
-                        {p.zweitstimmenAbsolut.toLocaleString('de-DE')}
                       </span>
                     </div>
                   </div>
-                  <div className="w-full bg-slate-100 rounded-full h-1.5 mt-2 overflow-hidden">
+
+                  {/* LINE 2 */}
+                  <div className="flex justify-between items-center text-xs text-slate-500">
+                    {/* Left: Full official party name */}
+                    <span className="truncate mr-4" title={p.parteiLang}>
+                      {p.parteiLang}
+                    </span>
+                    {/* Right: Absolute votes formatted with thousands separators followed by the word "Stimmen" */}
+                    <span className="font-mono shrink-0">
+                      {p.zweitstimmenAbsolut.toLocaleString('de-DE')} Stimmen
+                    </span>
+                  </div>
+
+                  {/* Progress Bar */}
+                  <div className="w-full bg-slate-100 rounded-full h-1 mt-1 overflow-hidden">
                     <div
                       className="h-full rounded-full transition-all duration-500"
                       style={{ 

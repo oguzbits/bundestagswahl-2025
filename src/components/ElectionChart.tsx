@@ -29,42 +29,63 @@ interface ChartDataItem {
   votes2?: number;
 }
 
+const ESTABLISHED_PARTIES = new Set([
+  'CDU',
+  'CSU',
+  'CDU/CSU',
+  'SPD',
+  'GRÜNE',
+  'GRÜNEN',
+  'BÜNDNIS 90/DIE GRÜNEN',
+  'FDP',
+  'AFD',
+  'DIE LINKE',
+  'LINKE',
+  'BSW'
+]);
+
 export function ElectionChart({ data, title, compareWith }: ElectionChartProps) {
-  // 1. Determine which parties to show as top parties and aggregate the rest into "Übrige"
-  // We want to limit display to parties with >= 0.5% or top 7 parties.
-  const getTopPartyNames = (ergebnis: GebietErgebnis): string[] => {
-    const top7 = ergebnis.parteien.slice(0, 7).map((p) => p.parteiKurz);
-    const aboveHalfPercent = ergebnis.parteien
-      .filter((p) => p.zweitstimmenRelativ >= 0.5)
-      .map((p) => p.parteiKurz);
-    
-    // Use whichever set is larger to ensure we don't truncate major ones
-    return aboveHalfPercent.length > top7.length ? aboveHalfPercent : top7;
+  // 1. Determine which parties to show as major parties and aggregate the rest into "Sonstige"
+  const isMajorParty = (p: { parteiKurz: string; parteiLang: string; zweitstimmenRelativ: number }) => {
+    const isEstablished = ESTABLISHED_PARTIES.has(p.parteiKurz.toUpperCase()) || 
+                          ESTABLISHED_PARTIES.has(p.parteiLang.toUpperCase());
+    const isHighPerformer = p.zweitstimmenRelativ >= 3.0;
+    return isEstablished || isHighPerformer;
   };
 
-  const topPartiesPrimary = getTopPartyNames(data);
-  const topPartiesCompare = compareWith ? getTopPartyNames(compareWith) : [];
+  const majorPartiesSet = new Set<string>();
   
-  // Union of top parties
-  const topPartiesSet = new Set([...topPartiesPrimary, ...topPartiesCompare]);
+  data.parteien.forEach((p) => {
+    if (isMajorParty(p)) {
+      majorPartiesSet.add(p.parteiKurz);
+    }
+  });
+
+  if (compareWith) {
+    compareWith.parteien.forEach((p) => {
+      if (isMajorParty(p)) {
+        majorPartiesSet.add(p.parteiKurz);
+      }
+    });
+  }
 
   // Lists of all parties to check for aggregation
   const primaryParties = data.parteien;
   const compareParties = compareWith ? compareWith.parteien : [];
 
   // Initialize aggregated variables
-  let primaryUebrigeVotes = 0;
-  let primaryUebrigePercent = 0;
-  let primaryUebrigeVotes2021 = 0;
-  let primaryUebrigePercent2021 = 0;
+  let primarySonstigeVotes = 0;
+  let primarySonstigePercent = 0;
+  let primarySonstigeVotes2021 = 0;
+  let primarySonstigePercent2021 = 0;
 
-  let compareUebrigeVotes = 0;
-  let compareUebrigePercent = 0;
+  let compareSonstigeVotes = 0;
+  let compareSonstigePercent = 0;
 
   const chartItems: ChartDataItem[] = [];
 
-  // Add individual top parties
-  topPartiesSet.forEach((partyName) => {
+  // Add individual major parties
+  majorPartiesSet.forEach((partyName) => {
     const p1 = primaryParties.find((p) => p.parteiKurz === partyName);
     const p2 = compareParties.find((p) => p.parteiKurz === partyName);
 
@@ -84,39 +105,39 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
 
   // Calculate "Sonstige" for primary
   primaryParties.forEach((p) => {
-    if (!topPartiesSet.has(p.parteiKurz)) {
-      primaryUebrigeVotes += p.zweitstimmenAbsolut;
-      primaryUebrigePercent += p.zweitstimmenRelativ;
-      primaryUebrigeVotes2021 += p.zweitstimmenAbsolut2021;
-      primaryUebrigePercent2021 += p.zweitstimmenRelativ2021;
+    if (!majorPartiesSet.has(p.parteiKurz)) {
+      primarySonstigeVotes += p.zweitstimmenAbsolut;
+      primarySonstigePercent += p.zweitstimmenRelativ;
+      primarySonstigeVotes2021 += p.zweitstimmenAbsolut2021;
+      primarySonstigePercent2021 += p.zweitstimmenRelativ2021;
     }
   });
 
   // Calculate "Sonstige" for comparison
   if (compareWith) {
     compareParties.forEach((p) => {
-      if (!topPartiesSet.has(p.parteiKurz)) {
-        compareUebrigeVotes += p.zweitstimmenAbsolut;
-        compareUebrigePercent += p.zweitstimmenRelativ;
+      if (!majorPartiesSet.has(p.parteiKurz)) {
+        compareSonstigeVotes += p.zweitstimmenAbsolut;
+        compareSonstigePercent += p.zweitstimmenRelativ;
       }
     });
   }
 
   // Round percentages to 1 decimal place
-  primaryUebrigePercent = Math.round(primaryUebrigePercent * 10) / 10;
-  primaryUebrigePercent2021 = Math.round(primaryUebrigePercent2021 * 10) / 10;
-  compareUebrigePercent = Math.round(compareUebrigePercent * 10) / 10;
+  primarySonstigePercent = Math.round(primarySonstigePercent * 10) / 10;
+  primarySonstigePercent2021 = Math.round(primarySonstigePercent2021 * 10) / 10;
+  compareSonstigePercent = Math.round(compareSonstigePercent * 10) / 10;
 
   // Add "Sonstige" if there are any remaining votes
-  if (primaryUebrigeVotes > 0 || compareUebrigeVotes > 0) {
+  if (primarySonstigeVotes > 0 || compareSonstigeVotes > 0) {
     chartItems.push({
       party: 'Sonstige',
       partyColor: getPartyColor('Sonstige'),
-      percentage1: primaryUebrigePercent,
-      votes1: primaryUebrigeVotes,
+      percentage1: primarySonstigePercent,
+      votes1: primarySonstigeVotes,
       ...(compareWith && {
-        percentage2: compareUebrigePercent,
-        votes2: compareUebrigeVotes,
+        percentage2: compareSonstigePercent,
+        votes2: compareSonstigeVotes,
       }),
     });
   }
@@ -149,7 +170,7 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
       let deltaStr = '';
       if (isSingleMode) {
         if (chartItem.party === 'Sonstige') {
-          deltaStr = formatDelta(primaryUebrigePercent, primaryUebrigePercent2021);
+          deltaStr = formatDelta(primarySonstigePercent, primarySonstigePercent2021);
         } else {
           const match = primaryParties.find((p) => p.parteiKurz === chartItem.party);
           if (match) {
@@ -239,7 +260,7 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
           <BarChart
             data={chartItems}
             margin={{ top: 10, right: 10, left: -20, bottom: 5 }}
-            barGap={4}
+            barGap={0}
           >
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
             <XAxis
@@ -274,22 +295,19 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
                 <Cell
                   key={`cell-1-${index}`}
                   fill={entry.partyColor}
-                  fillOpacity={compareWith ? 1.0 : 0.85}
+                  fillOpacity={1.0}
                 />
               ))}
             </Bar>
 
             {/* Comparison region bar (only if compareWith is present) */}
             {compareWith && (
-              <Bar name={name2} dataKey="percentage2" radius={[4, 4, 0, 0]}>
+              <Bar name={`${name2} (heller)`} dataKey="percentage2" radius={[4, 4, 0, 0]}>
                 {chartItems.map((entry, index) => (
                   <Cell
                     key={`cell-2-${index}`}
                     fill={entry.partyColor}
                     fillOpacity={0.5}
-                    stroke={entry.partyColor}
-                    strokeWidth={1.5}
-                    strokeDasharray="4 2"
                   />
                 ))}
               </Bar>
