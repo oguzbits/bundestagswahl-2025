@@ -20,6 +20,7 @@ export function PartyRow({ party, formatDeltaInfo }: PartyRowProps) {
           <span 
             className="w-3 h-3 rounded-full shrink-0 border border-black/10 shadow-sm"
             style={{ backgroundColor: partyColor }}
+            aria-hidden="true"
           />
           <span className="font-semibold text-sm text-slate-800">{party.parteiKurz}</span>
         </div>
@@ -35,7 +36,7 @@ export function PartyRow({ party, formatDeltaInfo }: PartyRowProps) {
       </div>
 
       {/* LINE 2 */}
-      <div className="flex justify-between items-center text-xs text-slate-500">
+      <div className="flex justify-between items-center text-xs text-slate-600">
         {/* Left: Full official party name */}
         <span className="truncate mr-4" title={party.parteiLang}>
           {party.parteiLang}
@@ -47,7 +48,7 @@ export function PartyRow({ party, formatDeltaInfo }: PartyRowProps) {
       </div>
 
       {/* Progress Bar */}
-      <div className="w-full bg-slate-100 rounded-full h-1 mt-1 overflow-hidden">
+      <div className="w-full bg-slate-100 rounded-full h-1 mt-1 overflow-hidden" aria-hidden="true">
         <div
           className="h-full rounded-full transition-all duration-500"
           style={{ 

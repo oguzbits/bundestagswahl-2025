@@ -29,6 +29,7 @@ export function Autocomplete({
 }: AutocompleteProps) {
   const [open, setOpen] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState('');
+  const triggerId = React.useId();
 
   const selectedOption = React.useMemo(() => {
     return options.find((opt) => opt.id === selectedId) || null;
@@ -51,12 +52,13 @@ export function Autocomplete({
 
   return (
     <div className="flex flex-col gap-1.5 w-full relative" data-testid="autocomplete">
-      <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+      <label htmlFor={triggerId} className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
         {label}
       </label>
       
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger
+          id={triggerId}
           role="combobox"
           aria-expanded={open}
           aria-haspopup="listbox"
