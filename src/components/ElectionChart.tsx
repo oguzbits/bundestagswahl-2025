@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import {
   BarChart,
   Bar,
@@ -50,32 +49,36 @@ export const formatFloorPercentage = (value: number): string => {
   return `${(Math.floor(value * 10) / 10).toFixed(1)}%`;
 };
 
-function useIsDesktop(breakpoint = 768): boolean {
-  const [isDesktop, setIsDesktop] = useState<boolean>(() => {
-    if (typeof window !== 'undefined') {
-      return window.innerWidth >= breakpoint;
-    }
-    return true;
-  });
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const handleResize = () => {
-      setIsDesktop(window.innerWidth >= breakpoint);
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, [breakpoint]);
-
-  return isDesktop;
+interface CustomLabelProps {
+  x?: number;
+  y?: number;
+  width?: number;
+  value?: number | string;
 }
 
+const renderCustomLabel = (props: CustomLabelProps) => {
+  const { x = 0, y = 0, width = 0, value } = props;
+  const offset = 8;
+  const displayValue = typeof value === 'number' ? formatFloorPercentage(value) : '';
+
+  return (
+    <g>
+      <text
+        x={x + width / 2}
+        y={y - offset}
+        fill="#0f172a"
+        fontSize={11}
+        textAnchor="middle"
+        dominantBaseline="middle"
+        className="hidden lg:block font-semibold pointer-events-none"
+      >
+        {displayValue}
+      </text>
+    </g>
+  );
+};
+
 export function ElectionChart({ data, title, compareWith }: ElectionChartProps) {
-  const isDesktop = useIsDesktop(768);
 
   // 1. Determine which parties to show as major parties and aggregate the rest into "Sonstige"
   const isMajorParty = (p: { parteiKurz: string; parteiLang: string; zweitstimmenRelativ: number }) => {
@@ -331,14 +334,10 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
                   fillOpacity={1.0}
                 />
               ))}
-              {isDesktop && (
-                <LabelList
-                  dataKey="percentage1"
-                  position="top"
-                  formatter={(value: number) => formatFloorPercentage(value)}
-                  className="text-[10px] md:text-xs fill-muted-foreground font-medium"
-                />
-              )}
+              <LabelList
+                dataKey="percentage1"
+                content={renderCustomLabel}
+              />
             </Bar>
 
             {/* Comparison region bar (only if compareWith is present) */}
@@ -351,14 +350,10 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
                     fillOpacity={0.5}
                   />
                 ))}
-                {isDesktop && (
-                  <LabelList
-                    dataKey="percentage2"
-                    position="top"
-                    formatter={(value: number) => formatFloorPercentage(value)}
-                    className="text-[10px] md:text-xs fill-muted-foreground font-medium"
-                  />
-                )}
+                <LabelList
+                  dataKey="percentage2"
+                  content={renderCustomLabel}
+                />
               </Bar>
             )}
           </BarChart>

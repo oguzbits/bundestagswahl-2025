@@ -31,15 +31,14 @@ vi.mock('recharts', () => {
     CartesianGrid: () => null,
     Tooltip: () => null,
     Legend: () => <div data-testid="legend" />,
-    LabelList: ({ dataKey, position, formatter, className }: any) => (
-      <div 
-        data-testid="label-list" 
-        data-datakey={dataKey} 
-        data-position={position} 
-        data-formatted-value-test={formatter ? formatter(31.7432) : undefined}
-        className={className} 
-      />
-    ),
+    LabelList: ({ dataKey, content }: any) => {
+      const renderedContent = content ? content({ value: 31.7432, x: 10, y: 20, width: 50 }) : null;
+      return (
+        <div data-testid="label-list" data-datakey={dataKey}>
+          {renderedContent}
+        </div>
+      );
+    },
   };
 });
 
@@ -264,12 +263,16 @@ describe('ElectionChart Component', () => {
     expect(labelLists).toHaveLength(2);
 
     expect(labelLists[0].getAttribute('data-datakey')).toBe('percentage1');
-    expect(labelLists[0].getAttribute('data-position')).toBe('top');
-    expect(labelLists[0].getAttribute('data-formatted-value-test')).toBe('31.7%');
+    const textEl1 = labelLists[0].querySelector('text');
+    expect(textEl1).toBeDefined();
+    expect(textEl1?.textContent).toBe('31.7%');
+    expect(textEl1?.getAttribute('class')).toContain('hidden lg:block');
 
     expect(labelLists[1].getAttribute('data-datakey')).toBe('percentage2');
-    expect(labelLists[1].getAttribute('data-position')).toBe('top');
-    expect(labelLists[1].getAttribute('data-formatted-value-test')).toBe('31.7%');
+    const textEl2 = labelLists[1].querySelector('text');
+    expect(textEl2).toBeDefined();
+    expect(textEl2?.textContent).toBe('31.7%');
+    expect(textEl2?.getAttribute('class')).toContain('hidden lg:block');
   });
 
   it('verifies formatFloorPercentage behaves correctly for boundary cases', () => {
@@ -279,57 +282,17 @@ describe('ElectionChart Component', () => {
     expect(formatFloorPercentage(30.48)).toBe('30.4%');
   });
 
-  it('verifies that LabelList is responsive and only renders on desktop viewports', () => {
-    const originalWidth = window.innerWidth;
-    
-    try {
-      // 1. Mobile viewport
-      act(() => {
-        Object.defineProperty(window, 'innerWidth', {
-          writable: true,
-          configurable: true,
-          value: 500,
-        });
-        window.dispatchEvent(new Event('resize'));
-      });
-      
-      const { rerender } = render(
-        <ElectionChart
-          data={mockGebiet1}
-          title="Test Responsive Labels"
-        />
-      );
-      
-      expect(screen.queryAllByTestId('label-list')).toHaveLength(0);
-      
-      // 2. Desktop viewport
-      act(() => {
-        Object.defineProperty(window, 'innerWidth', {
-          writable: true,
-          configurable: true,
-          value: 1024,
-        });
-        window.dispatchEvent(new Event('resize'));
-      });
-      
-      rerender(
-        <ElectionChart
-          data={mockGebiet1}
-          title="Test Responsive Labels"
-        />
-      );
-      
-      expect(screen.getAllByTestId('label-list')).toHaveLength(1);
-    } finally {
-      // Restore original innerWidth
-      act(() => {
-        Object.defineProperty(window, 'innerWidth', {
-          writable: true,
-          configurable: true,
-          value: originalWidth,
-        });
-        window.dispatchEvent(new Event('resize'));
-      });
-    }
+  it('verifies that LabelList is responsive via Tailwind CSS classes', () => {
+    render(
+      <ElectionChart
+        data={mockGebiet1}
+        title="Test Responsive Labels"
+      />
+    );
+
+    const labelList = screen.getByTestId('label-list');
+    const textEl = labelList.querySelector('text');
+    expect(textEl).toBeDefined();
+    expect(textEl?.getAttribute('class')).toContain('hidden lg:block');
   });
 });
