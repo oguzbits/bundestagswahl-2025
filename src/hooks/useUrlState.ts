@@ -58,11 +58,35 @@ export function useUrlState() {
     window.dispatchEvent(new Event(URL_CHANGE_EVENT));
   };
 
+  const swapPositions = () => {
+    const params = new URLSearchParams(window.location.search);
+    const g1 = params.get('gebiet1');
+    const g2 = params.get('gebiet2');
+    
+    if (g1) {
+      params.set('gebiet2', g1);
+    } else {
+      params.delete('gebiet2');
+    }
+    
+    if (g2) {
+      params.set('gebiet1', g2);
+    } else {
+      params.delete('gebiet1');
+    }
+
+    const newSearch = params.toString();
+    const newUrl = `${window.location.pathname}${newSearch ? `?${newSearch}` : ''}`;
+    window.history.pushState(null, '', newUrl);
+    window.dispatchEvent(new Event(URL_CHANGE_EVENT));
+  };
+
   return {
     gebiet1Id,
     gebiet2Id,
     setGebiet1Id,
     setGebiet2Id,
     clearSelection,
+    swapPositions,
   };
 }

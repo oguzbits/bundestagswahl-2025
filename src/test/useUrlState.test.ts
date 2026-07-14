@@ -89,4 +89,18 @@ describe('useUrlState Hook', () => {
 
     expect(result.current.gebiet1Id).toBe('789');
   });
+
+  it('swaps positions of gebiet1 and gebiet2 when swapPositions is called', () => {
+    window.location.search = '?gebiet1=901&gebiet2=902';
+    const { result } = renderHook(() => useUrlState());
+
+    act(() => {
+      result.current.swapPositions();
+    });
+
+    expect(result.current.gebiet1Id).toBe('902');
+    expect(result.current.gebiet2Id).toBe('901');
+    expect(window.location.search).toContain('gebiet1=902');
+    expect(window.location.search).toContain('gebiet2=901');
+  });
 });

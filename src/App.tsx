@@ -3,10 +3,10 @@ import { useElectionData } from './hooks/useElectionData';
 import { Autocomplete } from './components/Autocomplete';
 import { MetadataHeader } from './components/MetadataHeader';
 import { ElectionChart } from './components/ElectionChart';
-import { X } from 'lucide-react';
+import { X, ArrowLeftRight } from 'lucide-react';
 
 export default function App() {
-  const { gebiet1Id, gebiet2Id, setGebiet1Id, setGebiet2Id, clearSelection } = useUrlState();
+  const { gebiet1Id, gebiet2Id, setGebiet1Id, setGebiet2Id, clearSelection, swapPositions } = useUrlState();
   const { data, isLoading, error, searchOptions } = useElectionData();
 
   // Find the selected Gebiet in our map
@@ -66,17 +66,28 @@ export default function App() {
                   <p className="text-xs text-slate-500 mt-0.5">Ergebnisse auf Bundes-, Landes- oder Wahlkreisebene erkunden</p>
                 </div>
                 {(gebiet1Id || gebiet2Id) && (
-                  <button
-                    onClick={clearSelection}
-                    className="self-start md:self-auto px-4 py-2 text-xs font-bold bg-red-50 text-red-700 hover:bg-red-100 rounded-xl transition-all border border-red-100 flex items-center gap-1.5"
-                  >
-                    <X className="h-3.5 w-3.5" /> Alle Auswahlen aufheben
-                  </button>
+                  <div className="flex items-center gap-2">
+                    {gebiet1Id && gebiet2Id && (
+                      <button
+                        onClick={swapPositions}
+                        title="Regionen tauschen"
+                        className="px-4 py-2 text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 rounded-xl transition-all border border-slate-200 flex items-center gap-1.5"
+                      >
+                        <ArrowLeftRight className="h-3.5 w-3.5" /> Spalten tauschen
+                      </button>
+                    )}
+                    <button
+                      onClick={clearSelection}
+                      className="px-4 py-2 text-xs font-bold bg-red-50 text-red-700 hover:bg-red-100 rounded-xl transition-all border border-red-100 flex items-center gap-1.5"
+                    >
+                      <X className="h-3.5 w-3.5" /> Alle Auswahlen aufheben
+                    </button>
+                  </div>
                 )}
               </div>
 
               {/* 2-Column Autocomplete Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative">
                 {/* Column 1 Autocomplete */}
                 <div className="space-y-4">
                   <Autocomplete

@@ -55,6 +55,9 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
   // Initialize aggregated variables
   let primaryUebrigeVotes = 0;
   let primaryUebrigePercent = 0;
+  let primaryUebrigeVotes2021 = 0;
+  let primaryUebrigePercent2021 = 0;
+
   let compareUebrigeVotes = 0;
   let compareUebrigePercent = 0;
 
@@ -84,6 +87,8 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
     if (!topPartiesSet.has(p.parteiKurz)) {
       primaryUebrigeVotes += p.zweitstimmenAbsolut;
       primaryUebrigePercent += p.zweitstimmenRelativ;
+      primaryUebrigeVotes2021 += p.zweitstimmenAbsolut2021;
+      primaryUebrigePercent2021 += p.zweitstimmenRelativ2021;
     }
   });
 
@@ -99,6 +104,7 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
 
   // Round percentages to 1 decimal place
   primaryUebrigePercent = Math.round(primaryUebrigePercent * 10) / 10;
+  primaryUebrigePercent2021 = Math.round(primaryUebrigePercent2021 * 10) / 10;
   compareUebrigePercent = Math.round(compareUebrigePercent * 10) / 10;
 
   // Add "Übrige" if there are any remaining votes
@@ -126,32 +132,62 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
   const name1 = data.name;
   const name2 = compareWith ? compareWith.name : '';
 
+  // Helper for singlegebiet deltas
+  const formatDelta = (current: number, prev: number) => {
+    const delta = current - prev;
+    const sign = delta >= 0 ? '+' : '';
+    return `${sign}${delta.toFixed(1)}%`;
+  };
+
   // Custom Tooltip component
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
+      const isSingleMode = !compareWith;
+      const chartItem = payload[0].payload as ChartDataItem;
+
+      // Find party object to get 2021 comparison
+      let deltaStr = '';
+      if (isSingleMode) {
+        if (chartItem.party === 'Übrige') {
+          deltaStr = formatDelta(primaryUebrigePercent, primaryUebrigePercent2021);
+        } else {
+          const match = primaryParties.find((p) => p.parteiKurz === chartItem.party);
+          if (match) {
+            deltaStr = formatDelta(match.zweitstimmenRelativ, match.zweitstimmenRelativ2021);
+          }
+        }
+      }
+
       return (
         <div className="bg-white p-4 border border-slate-200 rounded-xl shadow-lg text-sm max-w-sm">
           <p className="font-bold text-slate-800 border-b border-slate-100 pb-1.5 mb-2">{label}</p>
           <div className="space-y-2">
             <div>
-              <p className="font-semibold text-xs text-slate-500 uppercase tracking-wider">{name1}</p>
+              {!isSingleMode && (
+                <p className="font-semibold text-xs text-slate-500 uppercase tracking-wider">{name1}</p>
+              )}
               <p className="text-slate-800">
                 <span className="font-bold text-base">
                   {payload[0].value?.toLocaleString('de-DE')}%
                 </span>
-                <span className="text-xs text-slate-500 ml-1.5">
-                  ({(payload[0].payload as ChartDataItem).votes1.toLocaleString('de-DE')} Stimmen)
+                {isSingleMode && deltaStr && (
+                  <span className={`text-xs font-semibold ml-2 ${deltaStr.startsWith('+') ? 'text-emerald-600' : 'text-rose-600'}`}>
+                    ({deltaStr})
+                  </span>
+                )}
+                <span className="text-xs text-slate-500 ml-1.5 block sm:inline">
+                  ({chartItem.votes1.toLocaleString('de-DE')} Stimmen)
                 </span>
               </p>
             </div>
-            {compareWith && payload[1] && (
+            {!isSingleMode && compareWith && payload[1] && (
               <div className="border-t border-slate-100 pt-2">
                 <p className="font-semibold text-xs text-slate-500 uppercase tracking-wider">{name2}</p>
                 <p className="text-slate-800">
                   <span className="font-bold text-base">
                     {payload[1].value?.toLocaleString('de-DE')}%
                   </span>
-                  <span className="text-xs text-slate-500 ml-1.5">
+                  <span className="text-xs text-slate-500 ml-1.5 block sm:inline">
                     ({(payload[1].payload as ChartDataItem).votes2?.toLocaleString('de-DE')} Stimmen)
                   </span>
                 </p>
@@ -222,13 +258,15 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
               unit="%"
             />
             <Tooltip content={<CustomTooltip />} cursor={{ fill: '#f8fafc' }} />
-            <Legend
-              verticalAlign="top"
-              height={36}
-              iconType="circle"
-              iconSize={8}
-              wrapperStyle={{ fontSize: '13px', fontWeight: 500, color: '#475569' }}
-            />
+            {!compareWith ? null : (
+              <Legend
+                verticalAlign="top"
+                height={36}
+                iconType="circle"
+                iconSize={8}
+                wrapperStyle={{ fontSize: '13px', fontWeight: 500, color: '#475569' }}
+              />
+            )}
             
             {/* Primary region bar */}
             <Bar name={name1} dataKey="percentage1" radius={[4, 4, 0, 0]}>
@@ -269,6 +307,7 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
               <th scope="col">Partei</th>
               <th scope="col">{name1} (Stimmen absolut)</th>
               <th scope="col">{name1} (Stimmen relativ %)</th>
+              {!compareWith && <th scope="col">{name1} (Veränderung zu 2021 %)</th>}
               {compareWith && (
                 <>
                   <th scope="col">{name2} (Stimmen absolut)</th>
@@ -285,6 +324,11 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
                   <th scope="row">{p.parteiLang || p.parteiKurz}</th>
                   <td>{p.zweitstimmenAbsolut.toLocaleString('de-DE')}</td>
                   <td>{p.zweitstimmenRelativ.toLocaleString('de-DE')}%</td>
+                  {!compareWith && (
+                    <td>
+                      {formatDelta(p.zweitstimmenRelativ, p.zweitstimmenRelativ2021)}
+                    </td>
+                  )}
                   {compareWith && (
                     <>
                       <td>{cpVal ? cpVal.zweitstimmenAbsolut.toLocaleString('de-DE') : '0'}</td>
