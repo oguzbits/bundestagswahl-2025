@@ -1,14 +1,14 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
-import { ElectionChart } from '../components/ElectionChart';
+import { render, screen, act } from '@testing-library/react';
+import { ElectionChart, formatFloorPercentage } from '../components/ElectionChart';
 import type { GebietErgebnis } from '../domain/types';
 
 // Mock Recharts components to allow direct inspection of props passed to them in JSDOM
 vi.mock('recharts', () => {
   return {
     ResponsiveContainer: ({ children }: any) => <div data-testid="responsive-container">{children}</div>,
-    BarChart: ({ children, barGap, data }: any) => (
-      <div data-testid="bar-chart" data-bargap={barGap} data-chartdata={JSON.stringify(data)}>
+    BarChart: ({ children, barGap, data, margin }: any) => (
+      <div data-testid="bar-chart" data-bargap={barGap} data-margin={JSON.stringify(margin)} data-chartdata={JSON.stringify(data)}>
         {children}
       </div>
     ),
@@ -21,10 +21,25 @@ vi.mock('recharts', () => {
       <div data-testid="cell" data-fill={fill} data-fillopacity={fillOpacity} />
     ),
     XAxis: () => <div data-testid="x-axis" />,
-    YAxis: () => <div data-testid="y-axis" />,
+    YAxis: ({ tickFormatter, domain }: any) => (
+      <div 
+        data-testid="y-axis" 
+        data-domain={JSON.stringify(domain)}
+        data-formatted-value-test={tickFormatter ? tickFormatter(32) : undefined}
+      />
+    ),
     CartesianGrid: () => null,
     Tooltip: () => null,
     Legend: () => <div data-testid="legend" />,
+    LabelList: ({ dataKey, position, formatter, className }: any) => (
+      <div 
+        data-testid="label-list" 
+        data-datakey={dataKey} 
+        data-position={position} 
+        data-formatted-value-test={formatter ? formatter(31.7432) : undefined}
+        className={className} 
+      />
+    ),
   };
 });
 
@@ -217,5 +232,104 @@ describe('ElectionChart Component', () => {
     expect(cells[0].getAttribute('data-fillopacity')).toBe('1');
     // Next 3 cells are for Bar 2 (SPD, CDU, Sonstige)
     expect(cells[3].getAttribute('data-fillopacity')).toBe('0.5');
+  });
+
+  it('verifies Y-axis margins, domain, and tick formatter', () => {
+    render(
+      <ElectionChart
+        data={mockGebiet1}
+        title="Test Y-Axis"
+      />
+    );
+
+    const chartEl = screen.getByTestId('bar-chart');
+    const margin = JSON.parse(chartEl.getAttribute('data-margin') || '{}');
+    expect(margin.left).toBeGreaterThanOrEqual(20);
+
+    const yAxisEl = screen.getByTestId('y-axis');
+    expect(yAxisEl.getAttribute('data-domain')).toBe(JSON.stringify(['auto', 'auto']));
+    expect(yAxisEl.getAttribute('data-formatted-value-test')).toBe('32.0%');
+  });
+
+  it('verifies persistent LabelList components and their formatters', () => {
+    render(
+      <ElectionChart
+        data={mockGebiet1}
+        compareWith={mockGebiet2}
+        title="Test Labels"
+      />
+    );
+
+    const labelLists = screen.getAllByTestId('label-list');
+    expect(labelLists).toHaveLength(2);
+
+    expect(labelLists[0].getAttribute('data-datakey')).toBe('percentage1');
+    expect(labelLists[0].getAttribute('data-position')).toBe('top');
+    expect(labelLists[0].getAttribute('data-formatted-value-test')).toBe('31.7%');
+
+    expect(labelLists[1].getAttribute('data-datakey')).toBe('percentage2');
+    expect(labelLists[1].getAttribute('data-position')).toBe('top');
+    expect(labelLists[1].getAttribute('data-formatted-value-test')).toBe('31.7%');
+  });
+
+  it('verifies formatFloorPercentage behaves correctly for boundary cases', () => {
+    expect(formatFloorPercentage(4.98)).toBe('4.9%');
+    expect(formatFloorPercentage(4.91)).toBe('4.9%');
+    expect(formatFloorPercentage(5.0)).toBe('5.0%');
+    expect(formatFloorPercentage(30.48)).toBe('30.4%');
+  });
+
+  it('verifies that LabelList is responsive and only renders on desktop viewports', () => {
+    const originalWidth = window.innerWidth;
+    
+    try {
+      // 1. Mobile viewport
+      act(() => {
+        Object.defineProperty(window, 'innerWidth', {
+          writable: true,
+          configurable: true,
+          value: 500,
+        });
+        window.dispatchEvent(new Event('resize'));
+      });
+      
+      const { rerender } = render(
+        <ElectionChart
+          data={mockGebiet1}
+          title="Test Responsive Labels"
+        />
+      );
+      
+      expect(screen.queryAllByTestId('label-list')).toHaveLength(0);
+      
+      // 2. Desktop viewport
+      act(() => {
+        Object.defineProperty(window, 'innerWidth', {
+          writable: true,
+          configurable: true,
+          value: 1024,
+        });
+        window.dispatchEvent(new Event('resize'));
+      });
+      
+      rerender(
+        <ElectionChart
+          data={mockGebiet1}
+          title="Test Responsive Labels"
+        />
+      );
+      
+      expect(screen.getAllByTestId('label-list')).toHaveLength(1);
+    } finally {
+      // Restore original innerWidth
+      act(() => {
+        Object.defineProperty(window, 'innerWidth', {
+          writable: true,
+          configurable: true,
+          value: originalWidth,
+        });
+        window.dispatchEvent(new Event('resize'));
+      });
+    }
   });
 });

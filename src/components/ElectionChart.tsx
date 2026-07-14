@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import {
   BarChart,
   Bar,
@@ -7,7 +8,8 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-  Cell
+  Cell,
+  LabelList
 } from 'recharts';
 import type { GebietErgebnis } from '../domain/types';
 import { getPartyColor } from '../domain/partyColors';
@@ -44,7 +46,37 @@ const ESTABLISHED_PARTIES = new Set([
   'BSW'
 ]);
 
+export const formatFloorPercentage = (value: number): string => {
+  return `${(Math.floor(value * 10) / 10).toFixed(1)}%`;
+};
+
+function useIsDesktop(breakpoint = 768): boolean {
+  const [isDesktop, setIsDesktop] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth >= breakpoint;
+    }
+    return true;
+  });
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const handleResize = () => {
+      setIsDesktop(window.innerWidth >= breakpoint);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [breakpoint]);
+
+  return isDesktop;
+}
+
 export function ElectionChart({ data, title, compareWith }: ElectionChartProps) {
+  const isDesktop = useIsDesktop(768);
+
   // 1. Determine which parties to show as major parties and aggregate the rest into "Sonstige"
   const isMajorParty = (p: { parteiKurz: string; parteiLang: string; zweitstimmenRelativ: number }) => {
     const isEstablished = ESTABLISHED_PARTIES.has(p.parteiKurz.toUpperCase()) || 
@@ -189,7 +221,7 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
               )}
               <p className="text-slate-800">
                 <span className="font-bold text-base">
-                  {payload[0].value !== undefined ? Number(payload[0].value).toFixed(2) : ''}%
+                  {payload[0].value !== undefined ? formatFloorPercentage(Number(payload[0].value)) : ''}
                 </span>
                 {isSingleMode && deltaStr && (
                   <span className={`text-xs font-semibold ml-2 ${deltaStr.startsWith('+') ? 'text-emerald-600' : 'text-rose-600'}`}>
@@ -206,7 +238,7 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
                 <p className="font-semibold text-xs text-slate-500 uppercase tracking-wider">{name2}</p>
                 <p className="text-slate-800">
                   <span className="font-bold text-base">
-                    {payload[1].value !== undefined ? Number(payload[1].value).toFixed(2) : ''}%
+                    {payload[1].value !== undefined ? formatFloorPercentage(Number(payload[1].value)) : ''}
                   </span>
                   <span className="text-xs text-slate-500 ml-1.5 block sm:inline">
                     ({(payload[1].payload as ChartDataItem).votes2?.toLocaleString('de-DE')} Stimmen)
@@ -259,7 +291,7 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={chartItems}
-            margin={{ top: 10, right: 10, left: -20, bottom: 5 }}
+            margin={{ top: 20, right: 10, left: 20, bottom: 5 }}
             barGap={0}
           >
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
@@ -276,8 +308,8 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
               axisLine={false}
               stroke="#64748b"
               fontSize={12}
-              unit="%"
-              tickFormatter={(value) => value.toFixed(2)}
+              domain={['auto', 'auto']}
+              tickFormatter={(value) => formatFloorPercentage(value)}
             />
             <Tooltip content={<CustomTooltip />} cursor={{ fill: '#f8fafc' }} />
             {!compareWith ? null : (
@@ -299,6 +331,14 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
                   fillOpacity={1.0}
                 />
               ))}
+              {isDesktop && (
+                <LabelList
+                  dataKey="percentage1"
+                  position="top"
+                  formatter={(value: number) => formatFloorPercentage(value)}
+                  className="text-[10px] md:text-xs fill-muted-foreground font-medium"
+                />
+              )}
             </Bar>
 
             {/* Comparison region bar (only if compareWith is present) */}
@@ -311,6 +351,14 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
                     fillOpacity={0.5}
                   />
                 ))}
+                {isDesktop && (
+                  <LabelList
+                    dataKey="percentage2"
+                    position="top"
+                    formatter={(value: number) => formatFloorPercentage(value)}
+                    className="text-[10px] md:text-xs fill-muted-foreground font-medium"
+                  />
+                )}
               </Bar>
             )}
           </BarChart>
