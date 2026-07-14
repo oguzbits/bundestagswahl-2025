@@ -50,7 +50,7 @@ export function Autocomplete({
   };
 
   return (
-    <div className="flex flex-col gap-1.5 w-full" data-testid="autocomplete">
+    <div className="flex flex-col gap-1.5 w-full relative" data-testid="autocomplete">
       <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
         {label}
       </label>
@@ -62,7 +62,7 @@ export function Autocomplete({
           aria-haspopup="listbox"
           aria-label={label}
           className={cn(
-            "flex h-11 w-full items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm shadow-sm transition-all text-left",
+            "flex h-11 w-full items-center justify-between rounded-xl border border-slate-200 bg-white pl-4 pr-16 py-2.5 text-sm shadow-sm transition-all text-left",
             "hover:bg-slate-50 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500",
             !selectedOption && "text-slate-400"
           )}
@@ -84,30 +84,32 @@ export function Autocomplete({
               placeholder
             )}
           </span>
-          <div className="flex items-center gap-1.5 ml-2 shrink-0">
-            {selectedOption && (
-              <span
-                role="button"
-                tabIndex={0}
-                onClick={handleClear}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    handleClear(e);
-                  }
-                }}
-                aria-label="Auswahl aufheben"
-                className="rounded-full p-1 hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
-              >
-                <X className="h-4 w-4" />
-              </span>
-            )}
-            <ChevronsUpDown className="h-4 w-4 text-slate-400" />
-          </div>
+          <ChevronsUpDown className="h-4 w-4 text-slate-400 absolute right-4 bottom-[14px] pointer-events-none" />
         </PopoverTrigger>
+
+        {selectedOption && (
+          <button
+            type="button"
+            onClick={handleClear}
+            aria-label="Auswahl aufheben"
+            className="absolute right-10 bottom-[8px] rounded-full p-1 hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 z-10"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        )}
         <PopoverContent 
           className="p-0 w-[var(--anchor-width)] max-w-[calc(100vw-2rem)] overflow-hidden shadow-xl border border-slate-200 rounded-xl bg-white"
           align="start"
+          sideOffset={8}
+          finalFocus={() => {
+            // Prevent pulling focus back to the trigger if the user has already tabbed out
+            // to another element on the page (like the swap button).
+            const activeEl = document.activeElement;
+            if (activeEl && activeEl !== document.body && !activeEl.closest('[data-slot="popover-content"]')) {
+              return false;
+            }
+            return true;
+          }}
         >
           <Command
             filter={(value, search) => {
@@ -133,7 +135,7 @@ export function Autocomplete({
               value={searchQuery}
               onValueChange={setSearchQuery}
             />
-            <CommandList className="max-h-[300px] overflow-y-auto">
+            <CommandList className="max-h-[300px] overflow-y-auto mt-2">
               <CommandEmpty className="py-6 text-center text-sm text-slate-500">
                 Keine passenden Regionen gefunden.
               </CommandEmpty>

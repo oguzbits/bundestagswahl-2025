@@ -99,7 +99,7 @@ export default function App() {
                       onClick={swapPositions}
                       title="Regionen tauschen"
                       aria-label="Regionen tauschen"
-                      className="p-2.5 text-slate-600 hover:text-indigo-600 bg-slate-100 hover:bg-indigo-50 border border-slate-200 hover:border-indigo-100 rounded-xl transition-all shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                      className="p-2.5 text-slate-600 hover:text-indigo-600 bg-slate-100 hover:bg-indigo-50 border border-slate-200 hover:border-indigo-100 rounded-xl transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-primary"
                     >
                       <ArrowLeftRight className="h-4 w-4" />
                     </button>
