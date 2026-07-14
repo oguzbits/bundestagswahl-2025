@@ -34,9 +34,9 @@ vi.mock('recharts', () => {
     LabelList: ({ dataKey, content }: any) => {
       const renderedContent = content ? content({ value: 31.7432, x: 10, y: 20, width: 50 }) : null;
       return (
-        <div data-testid="label-list" data-datakey={dataKey}>
+        <svg data-testid="label-list" data-datakey={dataKey}>
           {renderedContent}
-        </div>
+        </svg>
       );
     },
   };
