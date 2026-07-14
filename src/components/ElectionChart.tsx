@@ -1,16 +1,21 @@
-import { useState, useEffect } from 'react';
+/* eslint-disable react-refresh/only-export-components */
+import { useState, useEffect, useMemo } from 'react';
 import {
   BarChart,
   Bar,
   XAxis,
   YAxis,
   CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
   Cell,
   LabelList
 } from 'recharts';
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartLegend,
+  ChartLegendContent,
+  type ChartConfig
+} from './ui/chart';
 import type { GebietErgebnis } from '../domain/types';
 import { getPartyColor } from '../domain/partyColors';
 
@@ -61,8 +66,8 @@ const renderCustomLabel = (props: any) => {
   return (
     <g>
       <text
-        x={x + width / 2}
-        y={y - offset}
+        x={Number(x) + width / 2}
+        y={Number(y) - offset}
         fill="#0f172a"
         fontSize={11}
         textAnchor="middle"
@@ -118,7 +123,6 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
   // Initialize aggregated variables
   let primarySonstigeVotes = 0;
   let primarySonstigePercent = 0;
-  let primarySonstigeVotes2021 = 0;
   let primarySonstigePercent2021 = 0;
 
   let compareSonstigeVotes = 0;
@@ -150,7 +154,6 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
     if (!majorPartiesSet.has(p.parteiKurz)) {
       primarySonstigeVotes += p.zweitstimmenAbsolut;
       primarySonstigePercent += p.zweitstimmenRelativ;
-      primarySonstigeVotes2021 += p.zweitstimmenAbsolut2021;
       primarySonstigePercent2021 += p.zweitstimmenRelativ2021;
     }
   });
@@ -202,66 +205,7 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
     return `${sign}${delta.toFixed(2)}%`;
   };
 
-  // Custom Tooltip component
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      const isSingleMode = !compareWith;
-      const chartItem = payload[0].payload as ChartDataItem;
 
-      // Find party object to get 2021 comparison
-      let deltaStr = '';
-      if (isSingleMode) {
-        if (chartItem.party === 'Sonstige') {
-          deltaStr = formatDelta(primarySonstigePercent, primarySonstigePercent2021);
-        } else {
-          const match = primaryParties.find((p) => p.parteiKurz === chartItem.party);
-          if (match) {
-            deltaStr = formatDelta(match.zweitstimmenRelativ, match.zweitstimmenRelativ2021);
-          }
-        }
-      }
-
-      return (
-        <div className="bg-white p-2.5 sm:p-4 border border-slate-200 rounded-xl shadow-lg text-xs sm:text-sm max-w-[240px] sm:max-w-sm pointer-events-none">
-          <p className="font-bold text-slate-800 border-b border-slate-100 pb-1 mb-1.5 sm:pb-1.5 sm:mb-2">{label}</p>
-          <div className="space-y-1.5 sm:space-y-2">
-            <div>
-              {!isSingleMode && (
-                <p className="font-semibold text-[10px] sm:text-xs text-slate-500 uppercase tracking-wider">{name1}</p>
-              )}
-              <p className="text-slate-800 leading-tight">
-                <span className="font-bold text-sm sm:text-base">
-                  {payload[0].value !== undefined ? formatFloorPercentage(Number(payload[0].value)) : ''}
-                </span>
-                {isSingleMode && deltaStr && (
-                  <span className={`text-[10px] sm:text-xs font-semibold ml-1.5 ${deltaStr.startsWith('+') ? 'text-emerald-600' : 'text-rose-600'}`}>
-                    ({deltaStr})
-                  </span>
-                )}
-                <span className="text-[10px] sm:text-xs text-slate-500 ml-1 block sm:inline">
-                  ({chartItem.votes1.toLocaleString('de-DE')} Stimmen)
-                </span>
-              </p>
-            </div>
-            {!isSingleMode && compareWith && payload[1] && (
-              <div className="border-t border-slate-100 pt-1.5 sm:pt-2">
-                <p className="font-semibold text-[10px] sm:text-xs text-slate-500 uppercase tracking-wider">{name2}</p>
-                <p className="text-slate-800 leading-tight">
-                  <span className="font-bold text-sm sm:text-base">
-                    {payload[1].value !== undefined ? formatFloorPercentage(Number(payload[1].value)) : ''}
-                  </span>
-                  <span className="text-[10px] sm:text-xs text-slate-500 ml-1 block sm:inline">
-                    ({(payload[1].payload as ChartDataItem).votes2?.toLocaleString('de-DE')} Stimmen)
-                  </span>
-                </p>
-              </div>
-            )}
-          </div>
-        </div>
-      );
-    }
-    return null;
-  };
 
   // For the screen-reader only table, we list ALL parties in descending order of votes
   const allPartiesList = [...primaryParties];
@@ -290,26 +234,16 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
     return maxB - maxA;
   });
 
-  const renderCustomLegend = () => {
-    return (
-      <div className="flex justify-center items-center gap-6 pt-5 text-[13px] font-semibold text-slate-600">
-        <div className="flex items-center gap-2">
-          <span 
-            className="w-2 h-2 rounded-full inline-block" 
-            style={{ backgroundColor: '#475569' }}
-          />
-          <span>{name1}</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span 
-            className="w-2 h-2 rounded-full inline-block" 
-            style={{ backgroundColor: '#cbd5e1' }}
-          />
-          <span>{name2}</span>
-        </div>
-      </div>
-    );
-  };
+  const chartConfig = useMemo(() => ({
+    percentage1: {
+      label: name1,
+      color: '#475569',
+    },
+    percentage2: {
+      label: name2,
+      color: '#cbd5e1',
+    },
+  }), [name1, name2]) satisfies ChartConfig;
 
   return (
     <div className="bg-white rounded-2xl border border-slate-200 p-3 sm:p-6 shadow-sm space-y-4 sm:space-y-6">
@@ -320,7 +254,7 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
 
       <div className="w-full relative">
         <div className="h-[360px] sm:h-[420px] w-full relative">
-          <ResponsiveContainer width="100%" height="100%">
+          <ChartContainer config={chartConfig} className="h-full w-full aspect-auto">
             <BarChart
               key={isMobile ? 'mobile' : 'desktop'}
               data={chartItems}
@@ -349,9 +283,71 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
                 domain={[0, 'auto']}
                 tickFormatter={(value) => `${Math.floor(value)}`}
               />
-              <Tooltip content={<CustomTooltip />} cursor={{ fill: '#f8fafc' }} position={{ y: 10 }} />
+              <ChartTooltip
+                content={({ active, payload, label }: any) => {
+                  if (active && payload && payload.length) {
+                    const isSingleMode = !compareWith;
+                    const chartItem = payload[0].payload as ChartDataItem;
+
+                    // Find party object to get 2021 comparison
+                    let deltaStr = '';
+                    if (isSingleMode) {
+                      if (chartItem.party === 'Sonstige') {
+                        deltaStr = formatDelta(primarySonstigePercent, primarySonstigePercent2021);
+                      } else {
+                        const match = primaryParties.find((p) => p.parteiKurz === chartItem.party);
+                        if (match) {
+                          deltaStr = formatDelta(match.zweitstimmenRelativ, match.zweitstimmenRelativ2021);
+                        }
+                      }
+                    }
+
+                    return (
+                      <div className="grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs shadow-xl text-slate-800 pointer-events-none">
+                        <p className="font-semibold text-slate-800 border-b border-slate-100 pb-1 mb-1">{label}</p>
+                        <div className="grid gap-1.5">
+                          <div>
+                            {!isSingleMode && (
+                              <p className="text-[10px] text-slate-500 uppercase font-medium">{name1}</p>
+                            )}
+                            <p className="leading-tight flex items-baseline gap-1.5">
+                              <span className="font-mono font-medium text-slate-800 text-sm">
+                                {payload[0].value !== undefined ? formatFloorPercentage(Number(payload[0].value)) : ''}
+                              </span>
+                              {isSingleMode && deltaStr && (
+                                <span className={`text-[10px] font-semibold ${deltaStr.startsWith('+') ? 'text-emerald-600' : 'text-rose-600'}`}>
+                                  ({deltaStr})
+                                </span>
+                              )}
+                              <span className="text-[10px] text-slate-500">
+                                ({chartItem.votes1.toLocaleString('de-DE')} Stimmen)
+                              </span>
+                            </p>
+                          </div>
+                          {!isSingleMode && compareWith && payload[1] && (
+                            <div className="border-t border-slate-100 pt-1.5">
+                              <p className="text-[10px] text-slate-500 uppercase font-medium">{name2}</p>
+                              <p className="leading-tight flex items-baseline gap-1.5">
+                                <span className="font-mono font-medium text-slate-800 text-sm">
+                                  {payload[1].value !== undefined ? formatFloorPercentage(Number(payload[1].value)) : ''}
+                                </span>
+                                <span className="text-[10px] text-slate-500">
+                                  ({payload[1].payload.votes2?.toLocaleString('de-DE')} Stimmen)
+                                </span>
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  }
+                  return null;
+                }}
+                cursor={{ fill: '#f8fafc' }}
+                position={{ y: 10 }}
+              />
               {!compareWith ? null : (
-                <Legend content={renderCustomLegend} />
+                <ChartLegend content={<ChartLegendContent />} />
               )}
               
               {/* Primary region bar - rendered first */}
@@ -386,7 +382,7 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
                 </Bar>
               )}
             </BarChart>
-          </ResponsiveContainer>
+          </ChartContainer>
         </div>
       </div>
 

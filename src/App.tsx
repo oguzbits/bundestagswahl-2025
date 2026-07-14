@@ -4,6 +4,7 @@ import { Autocomplete } from './components/Autocomplete';
 import { MetadataHeader } from './components/MetadataHeader';
 import { ElectionChart } from './components/ElectionChart';
 import { RotateCcw, ArrowLeftRight } from 'lucide-react';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 export default function App() {
   const { gebiet1Id, gebiet2Id, setGebiet1Id, setGebiet2Id, clearSelection, swapPositions } = useUrlState();
@@ -29,6 +30,7 @@ export default function App() {
 
       {/* Main Content Area */}
       <main className="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
+        <ErrorBoundary>
         {/* Loading State */}
         {isLoading && (
           <div className="flex flex-col items-center justify-center py-20 space-y-4">
@@ -55,6 +57,7 @@ export default function App() {
         {/* Loaded Content */}
         {!isLoading && !error && (
           <div className="space-y-8">
+            {/* Search Controls Card */}
             {/* Search Controls Card */}
             <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
@@ -168,11 +171,20 @@ export default function App() {
 
                     {/* Combined comparison chart at the bottom */}
                     <div className="border-t border-slate-200 pt-8">
-                      <ElectionChart
-                        data={selectedGebiet1}
-                        compareWith={selectedGebiet2}
-                        title={`Vergleich: ${selectedGebiet1.name} vs. ${selectedGebiet2.name}`}
-                      />
+                      <ErrorBoundary
+                        fallback={(error) => (
+                          <div className="bg-slate-50 border border-slate-200 p-6 rounded-2xl text-center">
+                            <h4 className="text-sm font-bold text-slate-800">Das Vergleichsdiagramm konnte nicht geladen werden</h4>
+                            <p className="text-xs text-slate-500 mt-1">{error.message}</p>
+                          </div>
+                        )}
+                      >
+                        <ElectionChart
+                          data={selectedGebiet1}
+                          compareWith={selectedGebiet2}
+                          title={`Vergleich: ${selectedGebiet1.name} vs. ${selectedGebiet2.name}`}
+                        />
+                      </ErrorBoundary>
                     </div>
                   </div>
                 ) : null}
@@ -191,6 +203,7 @@ export default function App() {
             )}
           </div>
         )}
+        </ErrorBoundary>
       </main>
 
       <footer className="py-4 bg-slate-100/50 text-xs text-muted-foreground border-t border-slate-200">

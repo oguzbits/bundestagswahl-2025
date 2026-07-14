@@ -121,7 +121,7 @@ export function Autocomplete({
                 const matchesId = data.id.includes(searchLower);
                 
                 if (matchesName || matchesParent || matchesId) return 1;
-              } catch (e) {
+              } catch {
                 // Fallback
                 if (value.toLowerCase().includes(search.toLowerCase())) return 1;
               }

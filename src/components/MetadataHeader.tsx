@@ -18,7 +18,7 @@ export function MetadatenHeader({ gebiet, parentName }: MetadataHeaderProps) {
   const { displayList, sortedAndFilteredMinorParties } = partitionParties(gebiet.parteien);
 
   return (
-    <div className="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden transition-all hover:shadow-lg">
+    <div className="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden transition-all hover:shadow-lg flex flex-col gap-0">
       {/* Top Banner */}
       <div className={cn(
         "px-6 py-5 text-white flex justify-between items-center",
@@ -44,28 +44,28 @@ export function MetadatenHeader({ gebiet, parentName }: MetadataHeaderProps) {
 
       {/* Main Stats */}
       <div className="p-6 space-y-6">
-        <div className="grid grid-cols-3 gap-1.5 sm:gap-3 text-center">
-          <div className="bg-slate-50 rounded-xl p-2 sm:p-3 border border-slate-100 flex flex-col justify-center min-w-0">
-            <div className="text-[9px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider leading-tight">
-              <span className="hidden sm:inline">Wahlberechtigte</span>
-              <span className="sm:hidden">Wahl-<br/>berechtigte</span>
+        <div className="grid grid-cols-3 gap-1.5 xl:gap-3 text-center">
+          <div className="bg-slate-50 rounded-xl p-2 xl:p-3 border border-slate-100 flex flex-col justify-center min-w-0">
+            <div className="text-[9px] xl:text-[10px] text-slate-500 font-bold uppercase tracking-wider leading-tight">
+              <span className="hidden xl:inline">Wahlberechtigte</span>
+              <span className="xl:hidden">Wahl-<br/>berechtigte</span>
             </div>
-            <div className="text-[11px] xs:text-xs sm:text-base font-extrabold text-slate-800 mt-0.5 sm:mt-1 font-mono truncate">
+            <div className="text-[11px] xs:text-xs xl:text-base font-extrabold text-slate-800 mt-0.5 xl:mt-1 font-mono break-all">
               {gebiet.wahlberechtigte.toLocaleString('de-DE')}
             </div>
           </div>
-          <div className="bg-slate-50 rounded-xl p-2 sm:p-3 border border-slate-100 flex flex-col justify-center min-w-0">
-            <div className="text-[9px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider leading-tight">Wähler</div>
-            <div className="text-[11px] xs:text-xs sm:text-base font-extrabold text-slate-800 mt-0.5 sm:mt-1 font-mono truncate">
+          <div className="bg-slate-50 rounded-xl p-2 xl:p-3 border border-slate-100 flex flex-col justify-center min-w-0">
+            <div className="text-[9px] xl:text-[10px] text-slate-500 font-bold uppercase tracking-wider leading-tight">Wähler</div>
+            <div className="text-[11px] xs:text-xs xl:text-base font-extrabold text-slate-800 mt-0.5 xl:mt-1 font-mono break-all">
               {gebiet.waehler.toLocaleString('de-DE')}
             </div>
           </div>
-          <div className="bg-indigo-50/50 rounded-xl p-2 sm:p-3 border border-indigo-100 flex flex-col justify-center min-w-0">
-            <div className="text-[9px] sm:text-[10px] text-indigo-600 font-bold uppercase tracking-wider leading-tight">
-              <span className="hidden sm:inline">Wahlbeteiligung</span>
-              <span className="sm:hidden">Wahl-<br/>beteiligung</span>
+          <div className="bg-indigo-50/50 rounded-xl p-2 xl:p-3 border border-indigo-100 flex flex-col justify-center min-w-0">
+            <div className="text-[9px] xl:text-[10px] text-indigo-600 font-bold uppercase tracking-wider leading-tight">
+              <span className="hidden xl:inline">Wahlbeteiligung</span>
+              <span className="xl:hidden">Wahl-<br/>beteiligung</span>
             </div>
-            <div className="text-[11px] xs:text-xs sm:text-base md:text-lg font-black text-indigo-700 mt-0.5 font-mono truncate">
+            <div className="text-[11px] xs:text-xs xl:text-base font-black text-indigo-700 mt-0.5 font-mono break-all">
               {gebiet.wahlbeteiligung.toFixed(2)}%
             </div>
           </div>

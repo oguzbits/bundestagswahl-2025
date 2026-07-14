@@ -110,7 +110,7 @@ export function parseElectionData(
     const numId = parseInt(rawId, 10);
     if (isNaN(numId)) continue;
 
-    let paddedId = '';
+    let paddedId: string;
     let typ: GebietTyp;
     let uebergeordnetesGebietId: string | null = null;
 
@@ -160,7 +160,7 @@ export function parseElectionData(
     const gueltigeZweitstimmen2021 = parseSafeInt(parts[19]);
 
     // Party results
-    let rawParteien: ParteiErgebnis[] = [];
+    const rawParteien: ParteiErgebnis[] = [];
 
     for (const partyCol of partyColumns) {
       const zAbs = parseSafeInt(parts[partyCol.colIndex + 2]);
