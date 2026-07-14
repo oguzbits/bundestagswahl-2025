@@ -18,7 +18,7 @@ export function MetadatenHeader({ gebiet, parentName }: MetadataHeaderProps) {
   const { displayList, sortedAndFilteredMinorParties } = partitionParties(gebiet.parteien);
 
   return (
-    <div className="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden transition-all hover:shadow-lg flex flex-col gap-0">
+    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col gap-0">
       {/* Top Banner */}
       <div className={cn(
         "px-6 py-5 text-white flex justify-between items-center",
