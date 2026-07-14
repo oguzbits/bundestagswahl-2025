@@ -105,7 +105,7 @@ export default function App() {
                   )}
                 </div>
 
-                {/* Column 2 Autocomplete (Only if gebiet1 is selected) */}
+                {/* Column 2 Autocomplete */}
                 <div className="w-full">
                   {gebiet1Id ? (
                     <Autocomplete
@@ -116,11 +116,7 @@ export default function App() {
                       label="Vergleichsregion (Optional)"
                     />
                   ) : (
-                    <div className="h-11 flex items-center">
-                      <div className="text-xs text-slate-400 italic bg-slate-50 border border-dashed border-slate-200 rounded-xl px-4 py-2.5 w-full truncate">
-                        Bitte wählen Sie zuerst eine primäre Region aus.
-                      </div>
-                    </div>
+                    <div className="hidden md:block h-11" /> // spacer to keep track width 1fr
                   )}
                 </div>
               </div>
