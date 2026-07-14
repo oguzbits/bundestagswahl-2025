@@ -2,6 +2,8 @@
 
 A high-performance, single-page web application to explore and compare the official results of the 2025 German federal election (Bundestagswahl 2025) based on Open Data from the Bundeswahlleiterin.
 
+**Live Demo:** [https://bundestagswahl-2025-jsh1.vercel.app/](https://bundestagswahl-2025-jsh1.vercel.app/)
+
 ---
 
 ## 🛠️ How to Run the Project
@@ -18,6 +20,17 @@ A high-performance, single-page web application to explore and compare the offic
    ```bash
    npm run test
    ```
+
+---
+
+## 💻 Tech Stack & Tooling Choices
+
+- **React & TypeScript:** Standard industry foundation for type-safe component-driven frontends.
+- **Vite:** Chosen for its lightning-fast Hot Module Replacement (HMR) and optimized build configuration, facilitating a smooth feedback loop.
+- **Tailwind CSS:** Used for rapid utility-first styling to construct a clean, responsive layout without writing verbose CSS.
+- **Recharts:** Used for plotting election comparison charts because of its native React component integration, ease of styling, and straightforward responsive layout configurations.
+- **Radix / Base UI & Cmdk:** Powers the combobox search input to deliver a highly accessible, keyboard-navigable autocomplete experience out of the box.
+- **Vitest & React Testing Library:** Replaced Jest for modern, fast unit and integration testing aligned with Vite's configuration.
 
 ---
 
@@ -69,5 +82,8 @@ A high-performance, single-page web application to explore and compare the offic
 6. **Data Streaming & Session Memory:**
    - Parse massive election CSV datasets incrementally using chunk streams rather than holding full files in memory.
    - Synchronize selection memory in `localStorage` when loading from empty URLs.
+7. **Pre-commit Workflow & DX Improvements:** Setup pre-commit hooks with automated formatting, type checking, linting, and testing to establish a better developer experience (DX) and guarantee commit-level code quality.
 
 ---
+
+**Time Spent:** ~8 hours
