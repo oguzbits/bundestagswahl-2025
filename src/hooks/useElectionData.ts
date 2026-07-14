@@ -22,9 +22,9 @@ export function useElectionData() {
       setError(null);
       try {
         const [kergRes, parteienRes, wahlkreiseRes] = await Promise.all([
-          fetch('/src/assets/fixtures/kerg.csv'),
-          fetch('/src/assets/fixtures/btw25_parteien.csv'),
-          fetch('/src/assets/fixtures/btw25_wahlkreisnamen_utf8.csv'),
+          fetch('/fixtures/kerg.csv'),
+          fetch('/fixtures/btw25_parteien.csv'),
+          fetch('/fixtures/btw25_wahlkreisnamen_utf8.csv'),
         ]);
 
         if (!kergRes.ok || !parteienRes.ok || !wahlkreiseRes.ok) {
