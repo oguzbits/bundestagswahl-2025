@@ -42,7 +42,7 @@ export function PartyRow({ party, formatDeltaInfo }: PartyRowProps) {
         </span>
         {/* Right: Absolute votes formatted with thousands separators followed by the word "Stimmen" */}
         <span className="font-mono shrink-0">
-          {party.zweitstimmenAbsolut.toLocaleString('de-DE')} Stimmen
+          {party.zweitstimmenAbsolut.toLocaleString('de-DE')}
         </span>
       </div>
 

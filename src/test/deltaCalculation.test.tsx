@@ -129,7 +129,7 @@ describe('MetadataHeader Delta Calculations & Formatting', () => {
     expect(screen.getByText('Sonstige')).toBeInTheDocument();
     expect(screen.getByText(`${expectedRel.toFixed(2)}%`)).toBeInTheDocument();
     expect(screen.getByText(expectedDeltaText)).toBeInTheDocument();
-    expect(screen.getByText(`${expectedAbs.toLocaleString('de-DE')} Stimmen`)).toBeInTheDocument();
+    expect(screen.getByText(`${expectedAbs.toLocaleString('de-DE')}`)).toBeInTheDocument();
 
     // Summing all percentages in display:
     // SPD(38.0) + CDU(25.3) + GRÜNE(12.7) + VOLT(4.8) + BSW(6.3) + Sonstige(3.2)
