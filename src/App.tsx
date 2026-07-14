@@ -91,7 +91,7 @@ export default function App() {
                 {/* Column 1 Autocomplete */}
                 <div className="space-y-4">
                   <Autocomplete
-                    options={searchOptions}
+                    options={gebiet2Id ? searchOptions.filter((opt) => opt.id !== gebiet2Id) : searchOptions}
                     selectedId={gebiet1Id}
                     onSelect={setGebiet1Id}
                     placeholder="Suchen Sie nach einem Wahlkreis, Land oder dem Bund..."
@@ -103,7 +103,7 @@ export default function App() {
                 <div className="space-y-4">
                   {gebiet1Id ? (
                     <Autocomplete
-                      options={searchOptions}
+                      options={searchOptions.filter((opt) => opt.id !== gebiet1Id)}
                       selectedId={gebiet2Id}
                       onSelect={setGebiet2Id}
                       placeholder="Vergleichsregion suchen..."

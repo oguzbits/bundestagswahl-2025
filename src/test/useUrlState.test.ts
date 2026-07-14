@@ -103,4 +103,51 @@ describe('useUrlState Hook', () => {
     expect(window.location.search).toContain('gebiet1=902');
     expect(window.location.search).toContain('gebiet2=901');
   });
+
+  it('deletes gebiet2 from URL when setGebiet1Id is called with null (cleared)', () => {
+    window.location.search = '?gebiet1=901&gebiet2=902';
+    const { result } = renderHook(() => useUrlState());
+
+    act(() => {
+      result.current.setGebiet1Id(null);
+    });
+
+    expect(result.current.gebiet1Id).toBeNull();
+    expect(result.current.gebiet2Id).toBeNull();
+    expect(window.location.search).toBe('');
+  });
+
+  it('deletes gebiet2 when setGebiet1Id is set to the same value as the existing gebiet2', () => {
+    window.location.search = '?gebiet1=901&gebiet2=902';
+    const { result } = renderHook(() => useUrlState());
+
+    act(() => {
+      result.current.setGebiet1Id('902');
+    });
+
+    expect(result.current.gebiet1Id).toBe('902');
+    expect(result.current.gebiet2Id).toBeNull();
+    expect(window.location.search).toBe('?gebiet1=902');
+  });
+
+  it('ignores setting gebiet2 to the same value as gebiet1', () => {
+    window.location.search = '?gebiet1=901';
+    const { result } = renderHook(() => useUrlState());
+
+    act(() => {
+      result.current.setGebiet2Id('901');
+    });
+
+    expect(result.current.gebiet1Id).toBe('901');
+    expect(result.current.gebiet2Id).toBeNull();
+    expect(window.location.search).toBe('?gebiet1=901');
+  });
+
+  it('resolves duplicate initial URL parameters by setting gebiet2 to null', () => {
+    window.location.search = '?gebiet1=901&gebiet2=901';
+    const { result } = renderHook(() => useUrlState());
+
+    expect(result.current.gebiet1Id).toBe('901');
+    expect(result.current.gebiet2Id).toBeNull();
+  });
 });

@@ -11,7 +11,7 @@ export const PARTY_COLORS: Record<string, string> = {
   'DIE LINKE': '#BE3075',
   LINKE: '#BE3075',
   BSW: '#7C0A02',
-  'Übrige': '#9ca3af',
+  'Sonstige': '#9ca3af',
   'Other': '#9ca3af',
 };
 
@@ -26,7 +26,7 @@ export function getPartyColor(partyName: string): string {
   if (normalized.includes('AFD')) return PARTY_COLORS.AfD;
   if (normalized.includes('LINKE')) return PARTY_COLORS['DIE LINKE'];
   if (normalized.includes('BSW')) return PARTY_COLORS.BSW;
-  if (normalized.includes('ÜBRIGE') || normalized.includes('OTHER') || normalized.includes('SONSTIGE')) return PARTY_COLORS['Übrige'];
+  if (normalized.includes('ÜBRIGE') || normalized.includes('OTHER') || normalized.includes('SONSTIGE')) return PARTY_COLORS['Sonstige'];
 
   // Exact map or fallback
   return PARTY_COLORS[partyName] || '#9ca3af';

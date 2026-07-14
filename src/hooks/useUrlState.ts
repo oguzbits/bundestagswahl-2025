@@ -10,11 +10,20 @@ function getUrlParam(key: string): string | null {
 
 export function useUrlState() {
   const [gebiet1Id, setGebiet1IdState] = useState<string | null>(() => getUrlParam('gebiet1'));
-  const [gebiet2Id, setGebiet2IdState] = useState<string | null>(() => getUrlParam('gebiet2'));
+  const [gebiet2Id, setGebiet2IdState] = useState<string | null>(() => {
+    const g1 = getUrlParam('gebiet1');
+    const g2 = getUrlParam('gebiet2');
+    return (g1 && g1 === g2) ? null : g2;
+  });
 
   const handleUrlChange = () => {
-    setGebiet1IdState(getUrlParam('gebiet1'));
-    setGebiet2IdState(getUrlParam('gebiet2'));
+    const g1 = getUrlParam('gebiet1');
+    let g2 = getUrlParam('gebiet2');
+    if (g1 && g1 === g2) {
+      g2 = null;
+    }
+    setGebiet1IdState(g1);
+    setGebiet2IdState(g2);
   };
 
   useEffect(() => {
@@ -41,10 +50,29 @@ export function useUrlState() {
   };
 
   const setGebiet1Id = (id: string | null) => {
-    updateParam('gebiet1', id);
+    const params = new URLSearchParams(window.location.search);
+    if (id === null) {
+      params.delete('gebiet1');
+      params.delete('gebiet2');
+    } else {
+      params.set('gebiet1', id);
+      const currentG2 = params.get('gebiet2');
+      if (currentG2 === id) {
+        params.delete('gebiet2');
+      }
+    }
+    const newSearch = params.toString();
+    const newUrl = `${window.location.pathname}${newSearch ? `?${newSearch}` : ''}`;
+    
+    window.history.pushState(null, '', newUrl);
+    window.dispatchEvent(new Event(URL_CHANGE_EVENT));
   };
 
   const setGebiet2Id = (id: string | null) => {
+    const currentG1 = getUrlParam('gebiet1');
+    if (id !== null && currentG1 === id) {
+      return;
+    }
     updateParam('gebiet2', id);
   };
 

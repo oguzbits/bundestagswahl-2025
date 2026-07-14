@@ -82,7 +82,7 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
     }
   });
 
-  // Calculate "Übrige" for primary
+  // Calculate "Sonstige" for primary
   primaryParties.forEach((p) => {
     if (!topPartiesSet.has(p.parteiKurz)) {
       primaryUebrigeVotes += p.zweitstimmenAbsolut;
@@ -92,7 +92,7 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
     }
   });
 
-  // Calculate "Übrige" for comparison
+  // Calculate "Sonstige" for comparison
   if (compareWith) {
     compareParties.forEach((p) => {
       if (!topPartiesSet.has(p.parteiKurz)) {
@@ -107,11 +107,11 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
   primaryUebrigePercent2021 = Math.round(primaryUebrigePercent2021 * 10) / 10;
   compareUebrigePercent = Math.round(compareUebrigePercent * 10) / 10;
 
-  // Add "Übrige" if there are any remaining votes
+  // Add "Sonstige" if there are any remaining votes
   if (primaryUebrigeVotes > 0 || compareUebrigeVotes > 0) {
     chartItems.push({
-      party: 'Übrige',
-      partyColor: getPartyColor('Übrige'),
+      party: 'Sonstige',
+      partyColor: getPartyColor('Sonstige'),
       percentage1: primaryUebrigePercent,
       votes1: primaryUebrigeVotes,
       ...(compareWith && {
@@ -121,10 +121,10 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
     });
   }
 
-  // Sort chartItems by percentage1 descending, but keep 'Übrige' at the end
+  // Sort chartItems by percentage1 descending, but keep 'Sonstige' at the end
   chartItems.sort((a, b) => {
-    if (a.party === 'Übrige') return 1;
-    if (b.party === 'Übrige') return -1;
+    if (a.party === 'Sonstige') return 1;
+    if (b.party === 'Sonstige') return -1;
     return b.percentage1 - a.percentage1;
   });
 
@@ -148,7 +148,7 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
       // Find party object to get 2021 comparison
       let deltaStr = '';
       if (isSingleMode) {
-        if (chartItem.party === 'Übrige') {
+        if (chartItem.party === 'Sonstige') {
           deltaStr = formatDelta(primaryUebrigePercent, primaryUebrigePercent2021);
         } else {
           const match = primaryParties.find((p) => p.parteiKurz === chartItem.party);
