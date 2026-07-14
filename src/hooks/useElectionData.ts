@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import type { WahlDatenMap } from '../domain/types';
 import { parseElectionData } from '../domain/csvParser';
 
@@ -31,19 +31,18 @@ export function useElectionData() {
           throw new Error('Fehler beim Laden der Wahl-Dateien.');
         }
 
-        const [kergText, parteienText, wahlkreiseText] = await Promise.all([
-          kergRes.text(),
-          parteienRes.text(),
-          wahlkreiseRes.text(),
-        ]);
+        const kergCsv = await kergRes.text();
+        const parteienCsv = await parteienRes.text();
+        const wahlkreiseCsv = await wahlkreiseRes.text();
 
-        if (!active) return;
-
-        const parsed = parseElectionData(kergText, parteienText, wahlkreiseText);
-        setData(parsed);
+        if (active) {
+          const parsed = parseElectionData(kergCsv, parteienCsv, wahlkreiseCsv);
+          setData(parsed);
+        }
       } catch (err) {
-        if (!active) return;
-        setError(err instanceof Error ? err : new Error('Ein unbekannter Fehler ist aufgetreten'));
+        if (active) {
+          setError(err instanceof Error ? err : new Error('Ein unbekannter Fehler ist aufgetreten'));
+        }
       } finally {
         if (active) {
           setIsLoading(false);
@@ -58,7 +57,7 @@ export function useElectionData() {
     };
   }, []);
 
-  const searchOptions = useMemo<SearchOption[]>(() => {
+  const searchOptions = (() => {
     if (!data) return [];
 
     const options: SearchOption[] = Object.values(data).map((gebiet) => {
@@ -94,7 +93,7 @@ export function useElectionData() {
     });
 
     return options;
-  }, [data]);
+  })();
 
   return {
     data,

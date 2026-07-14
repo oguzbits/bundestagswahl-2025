@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { ElectionChart, formatFloorPercentage } from '../components/ElectionChart';
+import { ElectionChart } from '../components/ElectionChart';
+import { formatFloorPercentage } from '../utils/dataTransformer';
 import type { GebietErgebnis } from '../domain/types';
 
 // Mock Recharts components to allow direct inspection of props passed to them in JSDOM

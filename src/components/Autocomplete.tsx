@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useState, useId, type MouseEvent, type KeyboardEvent } from 'react';
 import { Check, ChevronsUpDown, X } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import {
@@ -27,24 +27,20 @@ export function Autocomplete({
   placeholder,
   label,
 }: AutocompleteProps) {
-  const [open, setOpen] = React.useState(false);
-  const [searchQuery, setSearchQuery] = React.useState('');
-  const triggerId = React.useId();
+  const [open, setOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const triggerId = useId();
 
-  const selectedOption = React.useMemo(() => {
-    return options.find((opt) => opt.id === selectedId) || null;
-  }, [options, selectedId]);
+  const selectedOption = options.find((opt) => opt.id === selectedId) || null;
 
   // Group the options by their type for display
-  const groupedOptions = React.useMemo(() => {
-    return {
-      Bund: options.filter((opt) => opt.type === 'Bund'),
-      Land: options.filter((opt) => opt.type === 'Land'),
-      Wahlkreis: options.filter((opt) => opt.type === 'Wahlkreis'),
-    };
-  }, [options]);
+  const groupedOptions = {
+    Bund: options.filter((opt) => opt.type === 'Bund'),
+    Land: options.filter((opt) => opt.type === 'Land'),
+    Wahlkreis: options.filter((opt) => opt.type === 'Wahlkreis'),
+  };
 
-  const handleClear = (e: React.MouseEvent | React.KeyboardEvent) => {
+  const handleClear = (e: MouseEvent | KeyboardEvent) => {
     e.stopPropagation(); // Prevent opening popover
     onSelect(null);
     setSearchQuery('');

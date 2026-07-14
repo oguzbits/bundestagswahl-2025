@@ -1,5 +1,4 @@
-/* eslint-disable react-refresh/only-export-components */
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import {
   BarChart,
   Bar,
@@ -18,6 +17,7 @@ import {
 } from './ui/chart';
 import type { GebietErgebnis } from '../domain/types';
 import { getPartyColor } from '../domain/partyColors';
+import { formatFloorPercentage } from '../utils/dataTransformer';
 
 interface ElectionChartProps {
   data: GebietErgebnis;
@@ -51,12 +51,15 @@ const ESTABLISHED_PARTIES = new Set([
   'BSW'
 ]);
 
-export const formatFloorPercentage = (value: number): string => {
-  return `${(Math.floor(value * 10) / 10).toFixed(1)}%`;
-};
 
+interface CustomLabelProps {
+  x?: number | string;
+  y?: number | string;
+  width?: number | string;
+  value?: unknown;
+}
 
-const renderCustomLabel = (props: any) => {
+const renderCustomLabel = (props: CustomLabelProps) => {
   const { x = 0, y = 0, width = 0, value } = props;
   const offset = 8;
   const displayValue = typeof value === 'number' 
@@ -66,7 +69,7 @@ const renderCustomLabel = (props: any) => {
   return (
     <g>
       <text
-        x={Number(x) + width / 2}
+        x={Number(x) + Number(width) / 2}
         y={Number(y) - offset}
         fill="#0f172a"
         fontSize={11}
@@ -234,7 +237,7 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
     return maxB - maxA;
   });
 
-  const chartConfig = useMemo(() => ({
+  const chartConfig = {
     percentage1: {
       label: name1,
       color: '#475569',
@@ -243,7 +246,7 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
       label: name2,
       color: '#cbd5e1',
     },
-  }), [name1, name2]) satisfies ChartConfig;
+  } satisfies ChartConfig;
 
   return (
     <div className="bg-white rounded-2xl border border-slate-200 p-3 sm:p-6 shadow-sm space-y-4 sm:space-y-6">
@@ -284,7 +287,14 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
                 tickFormatter={(value) => `${Math.floor(value)}`}
               />
               <ChartTooltip
-                content={({ active, payload, label }: any) => {
+                content={({ active, payload, label }: {
+                  active?: boolean;
+                  payload?: readonly {
+                    value?: number | string | readonly (number | string)[];
+                    payload?: ChartDataItem;
+                  }[];
+                  label?: string | number;
+                }) => {
                   if (active && payload && payload.length) {
                     const isSingleMode = !compareWith;
                     const chartItem = payload[0].payload as ChartDataItem;
@@ -332,7 +342,7 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
                                   {payload[1].value !== undefined ? formatFloorPercentage(Number(payload[1].value)) : ''}
                                 </span>
                                 <span className="text-[10px] text-slate-500">
-                                  ({payload[1].payload.votes2?.toLocaleString('de-DE')} Stimmen)
+                                  ({payload[1].payload?.votes2?.toLocaleString('de-DE')} Stimmen)
                                 </span>
                               </p>
                             </div>

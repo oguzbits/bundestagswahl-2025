@@ -129,3 +129,7 @@ export function partitionParties(parties: ParteiErgebnis[]): PartitionedParties 
     sortedAndFilteredMinorParties,
   };
 }
+
+export const formatFloorPercentage = (value: number): string => {
+  return `${(Math.floor(value * 10) / 10).toFixed(1)}%`;
+};

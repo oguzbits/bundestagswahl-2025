@@ -1,8 +1,8 @@
-import * as React from 'react';
+import { Component, type ReactNode, type ErrorInfo } from 'react';
 
 interface Props {
-  children: React.ReactNode;
-  fallback?: React.ReactNode | ((error: Error, reset: () => void) => React.ReactNode);
+  children: ReactNode;
+  fallback?: ReactNode | ((error: Error, reset: () => void) => ReactNode);
 }
 
 interface State {
@@ -10,7 +10,7 @@ interface State {
   error: Error | null;
 }
 
-export class ErrorBoundary extends React.Component<Props, State> {
+export class ErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = { hasError: false, error: null };
@@ -20,7 +20,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('ErrorBoundary caught an error:', error, errorInfo);
   }
 
