@@ -48,10 +48,13 @@ export function Autocomplete({
 
   return (
     <div className="flex flex-col gap-1.5 w-full relative" data-testid="autocomplete">
-      <label htmlFor={triggerId} className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+      <label
+        htmlFor={triggerId}
+        className="text-xs font-semibold text-slate-500 uppercase tracking-wider"
+      >
         {label}
       </label>
-      
+
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger
           id={triggerId}
@@ -60,20 +63,24 @@ export function Autocomplete({
           aria-haspopup="listbox"
           aria-label={label}
           className={cn(
-            "flex h-11 w-full items-center justify-between rounded-xl border border-slate-200 bg-white pl-4 pr-16 py-2.5 text-sm shadow-sm transition-all text-left",
-            "hover:bg-slate-50 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500",
-            !selectedOption && "text-slate-400"
+            'flex h-11 w-full items-center justify-between rounded-xl border border-slate-200 bg-white pl-4 pr-16 py-2.5 text-sm shadow-sm transition-all text-left',
+            'hover:bg-slate-50 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500',
+            !selectedOption && 'text-slate-400',
           )}
         >
           <span className="truncate flex-1 font-medium">
             {selectedOption ? (
               <span className="text-slate-900 flex items-center gap-2 min-w-0">
-                <span className={cn(
-                  "text-[10px] font-bold px-1.5 py-0.5 rounded-md uppercase tracking-wider border shrink-0",
-                  selectedOption.type === 'Bund' && "bg-slate-900 text-white border-slate-900",
-                  selectedOption.type === 'Land' && "bg-indigo-50 text-indigo-700 border-indigo-100",
-                  selectedOption.type === 'Wahlkreis' && "bg-slate-100 text-slate-600 border-slate-200"
-                )}>
+                <span
+                  className={cn(
+                    'text-[10px] font-bold px-1.5 py-0.5 rounded-md uppercase tracking-wider border shrink-0',
+                    selectedOption.type === 'Bund' && 'bg-slate-900 text-white border-slate-900',
+                    selectedOption.type === 'Land' &&
+                      'bg-indigo-50 text-indigo-700 border-indigo-100',
+                    selectedOption.type === 'Wahlkreis' &&
+                      'bg-slate-100 text-slate-600 border-slate-200',
+                  )}
+                >
                   {selectedOption.type}
                 </span>
                 <span className="truncate">{selectedOption.name}</span>
@@ -95,7 +102,7 @@ export function Autocomplete({
             <X className="h-4 w-4" />
           </button>
         )}
-        <PopoverContent 
+        <PopoverContent
           className="p-0 w-[var(--anchor-width)] max-w-[calc(100vw-2rem)] overflow-hidden shadow-xl border border-slate-200 rounded-xl bg-white"
           align="start"
           sideOffset={8}
@@ -103,7 +110,11 @@ export function Autocomplete({
             // Prevent pulling focus back to the trigger if the user has already tabbed out
             // to another element on the page (like the swap button).
             const activeEl = document.activeElement;
-            if (activeEl && activeEl !== document.body && !activeEl.closest('[data-slot="popover-content"]')) {
+            if (
+              activeEl &&
+              activeEl !== document.body &&
+              !activeEl.closest('[data-slot="popover-content"]')
+            ) {
               return false;
             }
             return true;
@@ -113,13 +124,19 @@ export function Autocomplete({
             filter={(value, search) => {
               // value contains JSON string with name and parentName and id
               try {
-                const data = JSON.parse(value) as { name: string; parentName: string | null; id: string };
+                const data = JSON.parse(value) as {
+                  name: string;
+                  parentName: string | null;
+                  id: string;
+                };
                 const searchLower = search.toLowerCase();
-                
+
                 const matchesName = data.name.toLowerCase().includes(searchLower);
-                const matchesParent = data.parentName ? data.parentName.toLowerCase().includes(searchLower) : false;
+                const matchesParent = data.parentName
+                  ? data.parentName.toLowerCase().includes(searchLower)
+                  : false;
                 const matchesId = data.id.includes(searchLower);
-                
+
                 if (matchesName || matchesParent || matchesId) return 1;
               } catch {
                 // Fallback
@@ -128,8 +145,8 @@ export function Autocomplete({
               return 0;
             }}
           >
-            <CommandInput 
-              placeholder="Name, Bundesland oder ID suchen..." 
+            <CommandInput
+              placeholder="Name, Bundesland oder ID suchen..."
               value={searchQuery}
               onValueChange={setSearchQuery}
             />
@@ -137,13 +154,17 @@ export function Autocomplete({
               <CommandEmpty className="py-6 text-center text-sm text-slate-500">
                 Keine passenden Regionen gefunden.
               </CommandEmpty>
-              
+
               {groupedOptions.Bund.length > 0 && (
                 <CommandGroup heading="Bund">
                   {groupedOptions.Bund.map((option) => (
                     <CommandItem
                       key={option.id}
-                      value={JSON.stringify({ id: option.id, name: option.name, parentName: option.parentName })}
+                      value={JSON.stringify({
+                        id: option.id,
+                        name: option.name,
+                        parentName: option.parentName,
+                      })}
                       onSelect={() => {
                         onSelect(option.id);
                         setOpen(false);
@@ -170,7 +191,11 @@ export function Autocomplete({
                   {groupedOptions.Land.map((option) => (
                     <CommandItem
                       key={option.id}
-                      value={JSON.stringify({ id: option.id, name: option.name, parentName: option.parentName })}
+                      value={JSON.stringify({
+                        id: option.id,
+                        name: option.name,
+                        parentName: option.parentName,
+                      })}
                       onSelect={() => {
                         onSelect(option.id);
                         setOpen(false);
@@ -197,7 +222,11 @@ export function Autocomplete({
                   {groupedOptions.Wahlkreis.map((option) => (
                     <CommandItem
                       key={option.id}
-                      value={JSON.stringify({ id: option.id, name: option.name, parentName: option.parentName })}
+                      value={JSON.stringify({
+                        id: option.id,
+                        name: option.name,
+                        parentName: option.parentName,
+                      })}
                       onSelect={() => {
                         onSelect(option.id);
                         setOpen(false);
@@ -210,7 +239,9 @@ export function Autocomplete({
                           <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200 uppercase tracking-wider shrink-0">
                             Wkr {option.id}
                           </span>
-                          <span className="text-slate-800 truncate font-semibold">{option.name}</span>
+                          <span className="text-slate-800 truncate font-semibold">
+                            {option.name}
+                          </span>
                         </div>
                         {option.parentName && (
                           <span className="text-xs text-slate-400 font-normal pl-1 truncate">

@@ -18,7 +18,7 @@ describe('Autocomplete Component', () => {
         onSelect={() => {}}
         placeholder="Select a territory..."
         label="Territory Selector"
-      />
+      />,
     );
 
     expect(screen.getByText('Territory Selector')).toBeDefined();
@@ -33,7 +33,7 @@ describe('Autocomplete Component', () => {
         onSelect={() => {}}
         placeholder="Select a territory..."
         label="Territory Selector"
-      />
+      />,
     );
 
     expect(screen.getByText('Bayern')).toBeDefined();
@@ -49,7 +49,7 @@ describe('Autocomplete Component', () => {
         onSelect={handleSelect}
         placeholder="Select a territory..."
         label="Territory Selector"
-      />
+      />,
     );
 
     const clearButton = screen.getByRole('button', { name: 'Auswahl aufheben' });

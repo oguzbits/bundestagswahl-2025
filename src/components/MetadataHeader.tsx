@@ -20,17 +20,22 @@ export function MetadatenHeader({ gebiet, parentName }: MetadataHeaderProps) {
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col gap-0">
       {/* Top Banner */}
-      <div className={cn(
-        "px-6 py-5 text-white flex justify-between items-center",
-        gebiet.typ === 'Bund' && "bg-slate-900",
-        gebiet.typ === 'Land' && "bg-indigo-900",
-        gebiet.typ === 'Wahlkreis' && "bg-slate-800"
-      )}>
+      <div
+        className={cn(
+          'px-6 py-5 text-white flex justify-between items-center',
+          gebiet.typ === 'Bund' && 'bg-slate-900',
+          gebiet.typ === 'Land' && 'bg-indigo-900',
+          gebiet.typ === 'Wahlkreis' && 'bg-slate-800',
+        )}
+      >
         <div className="flex flex-col justify-center min-h-[76px]">
           <span className="text-[10px] uppercase font-extrabold tracking-widest text-indigo-300 opacity-90 font-mono">
             {gebiet.typ}-Auswahl
           </span>
-          <h3 className="text-xl sm:text-2xl font-black tracking-tight mt-0.5 truncate max-w-[240px] sm:max-w-xs md:max-w-sm" title={gebiet.name}>
+          <h3
+            className="text-xl sm:text-2xl font-black tracking-tight mt-0.5 truncate max-w-[240px] sm:max-w-xs md:max-w-sm"
+            title={gebiet.name}
+          >
             {gebiet.name}
           </h3>
           <p className="text-xs text-slate-300 mt-0.5 font-medium min-h-[16px]">
@@ -48,14 +53,20 @@ export function MetadatenHeader({ gebiet, parentName }: MetadataHeaderProps) {
           <div className="bg-slate-50 rounded-xl p-2 xl:p-3 border border-slate-100 flex flex-col justify-center min-w-0">
             <div className="text-[9px] xl:text-[10px] text-slate-500 font-bold uppercase tracking-wider leading-tight">
               <span className="hidden xl:inline">Wahlberechtigte</span>
-              <span className="xl:hidden">Wahl-<br/>berechtigte</span>
+              <span className="xl:hidden">
+                Wahl-
+                <br />
+                berechtigte
+              </span>
             </div>
             <div className="text-[11px] xs:text-xs xl:text-base font-extrabold text-slate-800 mt-0.5 xl:mt-1 font-mono break-all">
               {gebiet.wahlberechtigte.toLocaleString('de-DE')}
             </div>
           </div>
           <div className="bg-slate-50 rounded-xl p-2 xl:p-3 border border-slate-100 flex flex-col justify-center min-w-0">
-            <div className="text-[9px] xl:text-[10px] text-slate-500 font-bold uppercase tracking-wider leading-tight">Wähler</div>
+            <div className="text-[9px] xl:text-[10px] text-slate-500 font-bold uppercase tracking-wider leading-tight">
+              Wähler
+            </div>
             <div className="text-[11px] xs:text-xs xl:text-base font-extrabold text-slate-800 mt-0.5 xl:mt-1 font-mono break-all">
               {gebiet.waehler.toLocaleString('de-DE')}
             </div>
@@ -63,7 +74,11 @@ export function MetadatenHeader({ gebiet, parentName }: MetadataHeaderProps) {
           <div className="bg-indigo-50/50 rounded-xl p-2 xl:p-3 border border-indigo-100 flex flex-col justify-center min-w-0">
             <div className="text-[9px] xl:text-[10px] text-indigo-600 font-bold uppercase tracking-wider leading-tight">
               <span className="hidden xl:inline">Wahlbeteiligung</span>
-              <span className="xl:hidden">Wahl-<br/>beteiligung</span>
+              <span className="xl:hidden">
+                Wahl-
+                <br />
+                beteiligung
+              </span>
             </div>
             <div className="text-[11px] xs:text-xs xl:text-base font-black text-indigo-700 mt-0.5 font-mono break-all">
               {gebiet.wahlbeteiligung.toFixed(2)}%
@@ -77,7 +92,9 @@ export function MetadatenHeader({ gebiet, parentName }: MetadataHeaderProps) {
         <div>
           <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4 flex justify-between border-b border-slate-100 pb-2">
             <span>Zweitstimmen</span>
-            <span className="font-mono">Gültig: {gebiet.gueltigeZweitstimmen.toLocaleString('de-DE')}</span>
+            <span className="font-mono">
+              Gültig: {gebiet.gueltigeZweitstimmen.toLocaleString('de-DE')}
+            </span>
           </h4>
 
           {/* SECTION 1: STATIC MAIN LIST (Always Visible) */}
@@ -100,7 +117,11 @@ export function MetadatenHeader({ gebiet, parentName }: MetadataHeaderProps) {
                       className="w-full py-2 px-3 flex items-center justify-between text-xs font-semibold text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-xl transition-all border border-slate-200 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                     >
                       <span>{showAll ? 'Weniger anzeigen' : 'Mehr Parteien anzeigen'}</span>
-                      {showAll ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                      {showAll ? (
+                        <ChevronUp className="h-4 w-4" />
+                      ) : (
+                        <ChevronDown className="h-4 w-4" />
+                      )}
                     </button>
                   }
                 />

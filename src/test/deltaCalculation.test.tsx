@@ -71,7 +71,7 @@ describe('MetadataHeader Delta Calculations & Formatting', () => {
         zweitstimmenRelativ: 4.8,
         zweitstimmenAbsolut2021: 10,
         zweitstimmenRelativ2021: 1.7, // Delta: +3.1% (high performer, >= 3.0%, should not be minor!)
-      }
+      },
     ],
   };
 
@@ -103,11 +103,23 @@ describe('MetadataHeader Delta Calculations & Formatting', () => {
 
     // Compute expected values dynamically:
     const ESTABLISHED_PARTIES = new Set([
-      'CDU', 'CSU', 'CDU/CSU', 'SPD', 'GRÜNE', 'GRÜNEN', 'BÜNDNIS 90/DIE GRÜNEN', 'FDP', 'AFD', 'DIE LINKE', 'LINKE', 'BSW'
+      'CDU',
+      'CSU',
+      'CDU/CSU',
+      'SPD',
+      'GRÜNE',
+      'GRÜNEN',
+      'BÜNDNIS 90/DIE GRÜNEN',
+      'FDP',
+      'AFD',
+      'DIE LINKE',
+      'LINKE',
+      'BSW',
     ]);
     const minorParties = mockGebiet.parteien.filter((p) => {
-      const isEstablished = ESTABLISHED_PARTIES.has(p.parteiKurz.toUpperCase()) || 
-                            ESTABLISHED_PARTIES.has(p.parteiLang.toUpperCase());
+      const isEstablished =
+        ESTABLISHED_PARTIES.has(p.parteiKurz.toUpperCase()) ||
+        ESTABLISHED_PARTIES.has(p.parteiLang.toUpperCase());
       const isHighPerformer = p.zweitstimmenRelativ >= 3.0;
       return !(isEstablished || isHighPerformer);
     });
@@ -115,16 +127,13 @@ describe('MetadataHeader Delta Calculations & Formatting', () => {
     const expectedAbs = minorParties.reduce((sum, p) => sum + p.zweitstimmenAbsolut, 0);
     const rawRel = minorParties.reduce((sum, p) => sum + p.zweitstimmenRelativ, 0);
     const expectedRel = Math.round(rawRel * 100) / 100;
-    
+
     const rawRel2021 = minorParties.reduce((sum, p) => sum + p.zweitstimmenRelativ2021, 0);
     const expectedRel2021 = Math.round(rawRel2021 * 100) / 100;
-    
+
     const delta = expectedRel - expectedRel2021;
-    const expectedDeltaText = delta > 0 
-      ? `(+${delta.toFixed(2)}%)` 
-      : delta < 0 
-        ? `(${delta.toFixed(2)}%)` 
-        : '(0.00%)';
+    const expectedDeltaText =
+      delta > 0 ? `(+${delta.toFixed(2)}%)` : delta < 0 ? `(${delta.toFixed(2)}%)` : '(0.00%)';
 
     expect(screen.getByText('Sonstige')).toBeInTheDocument();
     expect(screen.getByText(`${expectedRel.toFixed(2)}%`)).toBeInTheDocument();
@@ -136,7 +145,7 @@ describe('MetadataHeader Delta Calculations & Formatting', () => {
     // 38.0 + 25.3 + 12.7 + 4.8 + 6.3 + 3.2 = 90.3%
     // Adding PIRATEN (1.3%) and ÖDP (1.9%) directly equals 3.2%, ensuring the mathematical totals of primary parties + minor parties equals the sum of the full dataset:
     // 38.0 + 25.3 + 12.7 + 4.8 + 6.3 + 1.3 + 1.9 = 90.3%
-    
+
     // Accordion interaction:
     // By default, PIRATEN (1.3%) and ÖDP (1.9%) should be hidden in main view (only showing inside the accordion content)
     expect(screen.queryByText('Piratenpartei Deutschland')).toBeNull();
@@ -169,7 +178,7 @@ describe('MetadataHeader Delta Calculations & Formatting', () => {
           zweitstimmenAbsolut: 4981,
           zweitstimmenRelativ: 4.98,
           zweitstimmenAbsolut2021: 4900,
-          zweitstimmenRelativ2021: 4.90,
+          zweitstimmenRelativ2021: 4.9,
         },
         {
           parteiKurz: 'SPD',
@@ -177,8 +186,8 @@ describe('MetadataHeader Delta Calculations & Formatting', () => {
           zweitstimmenAbsolut: 4989,
           zweitstimmenRelativ: 4.99,
           zweitstimmenAbsolut2021: 4900,
-          zweitstimmenRelativ2021: 4.90,
-        }
+          zweitstimmenRelativ2021: 4.9,
+        },
       ],
     };
 

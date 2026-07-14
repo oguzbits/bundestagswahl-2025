@@ -18,7 +18,7 @@ describe('useUrlState Hook', () => {
       writable: true,
       configurable: true,
     });
-    
+
     vi.spyOn(window.history, 'pushState').mockImplementation((_state, _title, url) => {
       const urlStr = url ? url.toString() : '';
       const searchIndex = urlStr.indexOf('?');
@@ -37,14 +37,14 @@ describe('useUrlState Hook', () => {
   it('reads initial values from the URL search parameters', () => {
     window.location.search = '?gebiet1=901&gebiet2=902';
     const { result } = renderHook(() => useUrlState());
-    
+
     expect(result.current.gebiet1Id).toBe('901');
     expect(result.current.gebiet2Id).toBe('902');
   });
 
   it('updates state and URL when setGebiet1Id is called', () => {
     const { result } = renderHook(() => useUrlState());
-    
+
     act(() => {
       result.current.setGebiet1Id('123');
     });
@@ -55,7 +55,7 @@ describe('useUrlState Hook', () => {
 
   it('updates state and URL when setGebiet2Id is called', () => {
     const { result } = renderHook(() => useUrlState());
-    
+
     act(() => {
       result.current.setGebiet2Id('456');
     });
@@ -79,7 +79,7 @@ describe('useUrlState Hook', () => {
 
   it('updates state in response to custom urlstate-change events', () => {
     const { result } = renderHook(() => useUrlState());
-    
+
     expect(result.current.gebiet1Id).toBeNull();
 
     act(() => {

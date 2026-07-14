@@ -34,7 +34,7 @@ describe('consolidateUnion', () => {
     const result = consolidateUnion(mockParties);
 
     // Assert only one CDU/CSU entry exists
-    const unionMatches = result.filter(p => p.parteiKurz === 'CDU/CSU');
+    const unionMatches = result.filter((p) => p.parteiKurz === 'CDU/CSU');
     expect(unionMatches).toHaveLength(1);
 
     const union = unionMatches[0];
@@ -45,11 +45,11 @@ describe('consolidateUnion', () => {
     expect(union.zweitstimmenRelativ2021).toBe(29.5); // 22.5 + 7.0
 
     // Assert neither CDU nor CSU exists separately
-    expect(result.some(p => p.parteiKurz === 'CDU')).toBe(false);
-    expect(result.some(p => p.parteiKurz === 'CSU')).toBe(false);
+    expect(result.some((p) => p.parteiKurz === 'CDU')).toBe(false);
+    expect(result.some((p) => p.parteiKurz === 'CSU')).toBe(false);
 
     // SPD should still exist untouched
-    const spd = result.find(p => p.parteiKurz === 'SPD');
+    const spd = result.find((p) => p.parteiKurz === 'SPD');
     expect(spd).toBeDefined();
     expect(spd?.zweitstimmenAbsolut).toBe(4000);
   });
@@ -84,15 +84,15 @@ describe('consolidateUnion', () => {
 
     const result = consolidateUnion(mockParties);
 
-    const unionMatches = result.filter(p => p.parteiKurz === 'CDU/CSU');
+    const unionMatches = result.filter((p) => p.parteiKurz === 'CDU/CSU');
     expect(unionMatches).toHaveLength(1);
 
     const union = unionMatches[0];
     expect(union.zweitstimmenAbsolut).toBe(5000);
     expect(union.zweitstimmenRelativ).toBe(25.0);
 
-    expect(result.some(p => p.parteiKurz === 'CDU')).toBe(false);
-    expect(result.some(p => p.parteiKurz === 'CSU')).toBe(false);
+    expect(result.some((p) => p.parteiKurz === 'CDU')).toBe(false);
+    expect(result.some((p) => p.parteiKurz === 'CSU')).toBe(false);
   });
 
   it('should map only CSU to "CDU/CSU" inside Bavaria and completely remove the 0% CDU entry', () => {
@@ -125,14 +125,14 @@ describe('consolidateUnion', () => {
 
     const result = consolidateUnion(mockParties);
 
-    const unionMatches = result.filter(p => p.parteiKurz === 'CDU/CSU');
+    const unionMatches = result.filter((p) => p.parteiKurz === 'CDU/CSU');
     expect(unionMatches).toHaveLength(1);
 
     const union = unionMatches[0];
     expect(union.zweitstimmenAbsolut).toBe(6000);
     expect(union.zweitstimmenRelativ).toBe(35.0);
 
-    expect(result.some(p => p.parteiKurz === 'CDU')).toBe(false);
-    expect(result.some(p => p.parteiKurz === 'CSU')).toBe(false);
+    expect(result.some((p) => p.parteiKurz === 'CDU')).toBe(false);
+    expect(result.some((p) => p.parteiKurz === 'CSU')).toBe(false);
   });
 });

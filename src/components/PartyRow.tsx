@@ -10,14 +10,14 @@ export interface PartyRowProps {
 export function PartyRow({ party, formatDeltaInfo }: PartyRowProps) {
   const deltaInfo = formatDeltaInfo(party.zweitstimmenRelativ, party.zweitstimmenRelativ2021);
   const partyColor = getPartyColor(party.parteiKurz);
-  
+
   return (
     <div className="group p-2.5 rounded-xl hover:bg-slate-50 transition-all border border-transparent hover:border-slate-100 flex flex-col space-y-1.5">
       {/* LINE 1 */}
       <div className="flex justify-between items-center">
         {/* Left: Colored dot + Party short name in bold */}
         <div className="flex items-center space-x-2">
-          <span 
+          <span
             className="w-3 h-3 rounded-full shrink-0 border border-black/10 shadow-sm"
             style={{ backgroundColor: partyColor }}
             aria-hidden="true"
@@ -29,7 +29,7 @@ export function PartyRow({ party, formatDeltaInfo }: PartyRowProps) {
           <span className="font-bold text-sm text-slate-900">
             {party.zweitstimmenRelativ.toFixed(2)}%
           </span>
-          <span className={cn("text-xs font-semibold", deltaInfo.className)}>
+          <span className={cn('text-xs font-semibold', deltaInfo.className)}>
             ({deltaInfo.text})
           </span>
         </div>
@@ -51,9 +51,9 @@ export function PartyRow({ party, formatDeltaInfo }: PartyRowProps) {
       <div className="w-full bg-slate-100 rounded-full h-1 mt-1 overflow-hidden" aria-hidden="true">
         <div
           className="h-full rounded-full transition-all duration-500"
-          style={{ 
+          style={{
             width: `${party.zweitstimmenRelativ}%`,
-            backgroundColor: partyColor
+            backgroundColor: partyColor,
           }}
         />
       </div>

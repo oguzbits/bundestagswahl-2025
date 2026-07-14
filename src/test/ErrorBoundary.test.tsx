@@ -27,7 +27,7 @@ describe('ErrorBoundary Component', () => {
     render(
       <ErrorBoundary>
         <BuggyComponent shouldThrow={false} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     expect(screen.getByText('Component rendered successfully')).toBeInTheDocument();
@@ -37,7 +37,7 @@ describe('ErrorBoundary Component', () => {
     render(
       <ErrorBoundary>
         <BuggyComponent shouldThrow={true} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     expect(screen.getByText('Ein unerwarteter Fehler ist aufgetreten')).toBeInTheDocument();
@@ -50,7 +50,7 @@ describe('ErrorBoundary Component', () => {
     render(
       <ErrorBoundary fallback={<div data-testid="custom-fallback">Custom Fallback UI</div>}>
         <BuggyComponent shouldThrow={true} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     expect(screen.getByTestId('custom-fallback')).toBeInTheDocument();
@@ -65,16 +65,23 @@ describe('ErrorBoundary Component', () => {
         fallback={(error, reset) => (
           <div>
             <span>Custom Function Fallback: {error.message}</span>
-            <button onClick={() => { resetCalled = true; reset(); }}>Reset Error</button>
+            <button
+              onClick={() => {
+                resetCalled = true;
+                reset();
+              }}
+            >
+              Reset Error
+            </button>
           </div>
         )}
       >
         <BuggyComponent shouldThrow={true} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     expect(screen.getByText('Custom Function Fallback: Test rendering error')).toBeInTheDocument();
-    
+
     const resetBtn = screen.getByRole('button', { name: 'Reset Error' });
     fireEvent.click(resetBtn);
 

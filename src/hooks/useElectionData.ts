@@ -41,7 +41,9 @@ export function useElectionData() {
         }
       } catch (err) {
         if (active) {
-          setError(err instanceof Error ? err : new Error('Ein unbekannter Fehler ist aufgetreten'));
+          setError(
+            err instanceof Error ? err : new Error('Ein unbekannter Fehler ist aufgetreten'),
+          );
         }
       } finally {
         if (active) {
@@ -102,4 +104,3 @@ export function useElectionData() {
     error,
   };
 }
-

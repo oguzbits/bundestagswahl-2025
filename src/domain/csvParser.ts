@@ -36,7 +36,7 @@ export function splitCsvLine(line: string): string[] {
 export function parseElectionData(
   kergCsvText: string,
   parteienCsvText: string,
-  wahlkreiseCsvText: string
+  wahlkreiseCsvText: string,
 ): WahlDatenMap {
   const wahlDatenMap: WahlDatenMap = {};
 
@@ -100,7 +100,7 @@ export function parseElectionData(
   for (let rowIndex = 8; rowIndex < kergLines.length; rowIndex++) {
     const line = kergLines[rowIndex]?.trim();
     if (!line) continue;
-    
+
     const parts = splitCsvLine(line);
     if (parts.length < 20) continue;
 
@@ -147,13 +147,11 @@ export function parseElectionData(
     const waehler = parseSafeInt(parts[8]);
     const waehler2021 = parseSafeInt(parts[9]);
 
-    const wahlbeteiligung = wahlberechtigte > 0
-      ? roundToTwoDecimals((waehler / wahlberechtigte) * 100)
-      : 0;
+    const wahlbeteiligung =
+      wahlberechtigte > 0 ? roundToTwoDecimals((waehler / wahlberechtigte) * 100) : 0;
 
-    const wahlbeteiligung2021 = wahlberechtigte2021 > 0
-      ? roundToTwoDecimals((waehler2021 / wahlberechtigte2021) * 100)
-      : 0;
+    const wahlbeteiligung2021 =
+      wahlberechtigte2021 > 0 ? roundToTwoDecimals((waehler2021 / wahlberechtigte2021) * 100) : 0;
 
     // Valid second votes
     const gueltigeZweitstimmen = parseSafeInt(parts[18]);
@@ -166,13 +164,13 @@ export function parseElectionData(
       const zAbs = parseSafeInt(parts[partyCol.colIndex + 2]);
       const zAbs2021 = parseSafeInt(parts[partyCol.colIndex + 3]);
 
-      const zRel = gueltigeZweitstimmen > 0
-        ? roundToTwoDecimals((zAbs / gueltigeZweitstimmen) * 100)
-        : 0;
+      const zRel =
+        gueltigeZweitstimmen > 0 ? roundToTwoDecimals((zAbs / gueltigeZweitstimmen) * 100) : 0;
 
-      const zRel2021 = gueltigeZweitstimmen2021 > 0
-        ? roundToTwoDecimals((zAbs2021 / gueltigeZweitstimmen2021) * 100)
-        : 0;
+      const zRel2021 =
+        gueltigeZweitstimmen2021 > 0
+          ? roundToTwoDecimals((zAbs2021 / gueltigeZweitstimmen2021) * 100)
+          : 0;
 
       rawParteien.push({
         parteiKurz: partyCol.shortName,
@@ -191,13 +189,14 @@ export function parseElectionData(
     const parteien: ParteiErgebnis[] = [];
     if (cduEntry || csuEntry) {
       const unionAbs = (cduEntry?.zweitstimmenAbsolut || 0) + (csuEntry?.zweitstimmenAbsolut || 0);
-      const unionAbs2021 = (cduEntry?.zweitstimmenAbsolut2021 || 0) + (csuEntry?.zweitstimmenAbsolut2021 || 0);
-      const unionRel = gueltigeZweitstimmen > 0
-        ? roundToTwoDecimals((unionAbs / gueltigeZweitstimmen) * 100)
-        : 0;
-      const unionRel2021 = gueltigeZweitstimmen2021 > 0
-        ? roundToTwoDecimals((unionAbs2021 / gueltigeZweitstimmen2021) * 100)
-        : 0;
+      const unionAbs2021 =
+        (cduEntry?.zweitstimmenAbsolut2021 || 0) + (csuEntry?.zweitstimmenAbsolut2021 || 0);
+      const unionRel =
+        gueltigeZweitstimmen > 0 ? roundToTwoDecimals((unionAbs / gueltigeZweitstimmen) * 100) : 0;
+      const unionRel2021 =
+        gueltigeZweitstimmen2021 > 0
+          ? roundToTwoDecimals((unionAbs2021 / gueltigeZweitstimmen2021) * 100)
+          : 0;
 
       parteien.push({
         parteiKurz: 'CDU/CSU',

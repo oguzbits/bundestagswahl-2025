@@ -14,7 +14,9 @@ window.HTMLElement.prototype.scrollIntoView = vi.fn();
 // Mock Recharts components so they render cleanly in JSDOM and can be asserted on.
 vi.mock('recharts', () => {
   return {
-    ResponsiveContainer: ({ children }: { children?: React.ReactNode }) => <div data-testid="responsive-container">{children}</div>,
+    ResponsiveContainer: ({ children }: { children?: React.ReactNode }) => (
+      <div data-testid="responsive-container">{children}</div>
+    ),
     BarChart: ({ children, data }: { children?: React.ReactNode; data?: unknown[] }) => (
       <div data-testid="bar-chart" data-chartdata={JSON.stringify(data)}>
         {children}
@@ -63,17 +65,20 @@ WKR_NR;WKR_NAME;LAND_NR;LAND_NAME;LAND_ABK
 
   beforeEach(() => {
     // Mock fetch for election data
-    vi.stubGlobal('fetch', vi.fn((url: string) => {
-      let text = '';
-      if (url.includes('kerg.csv')) text = mockKergCsv;
-      else if (url.includes('btw25_parteien.csv')) text = mockParteienCsv;
-      else if (url.includes('btw25_wahlkreisnamen_utf8.csv')) text = mockWahlkreiseCsv;
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((url: string) => {
+        let text = '';
+        if (url.includes('kerg.csv')) text = mockKergCsv;
+        else if (url.includes('btw25_parteien.csv')) text = mockParteienCsv;
+        else if (url.includes('btw25_wahlkreisnamen_utf8.csv')) text = mockWahlkreiseCsv;
 
-      return Promise.resolve({
-        ok: true,
-        text: () => Promise.resolve(text),
-      });
-    }));
+        return Promise.resolve({
+          ok: true,
+          text: () => Promise.resolve(text),
+        });
+      }),
+    );
 
     // Mock window.location and pushState for URL routing tests
     const mockLocation = {
@@ -87,7 +92,7 @@ WKR_NR;WKR_NAME;LAND_NR;LAND_NAME;LAND_ABK
       writable: true,
       configurable: true,
     });
-    
+
     vi.spyOn(window.history, 'pushState').mockImplementation((_state, _title, url) => {
       const urlStr = url ? url.toString() : '';
       const searchIndex = urlStr.indexOf('?');
@@ -109,7 +114,9 @@ WKR_NR;WKR_NAME;LAND_NR;LAND_NAME;LAND_ABK
 
     // Wait for the data to finish loading and the initial empty state to render
     await waitFor(() => {
-      expect(screen.queryByText('Wahldaten werden verarbeitet und Ergebnisse geladen...')).not.toBeInTheDocument();
+      expect(
+        screen.queryByText('Wahldaten werden verarbeitet und Ergebnisse geladen...'),
+      ).not.toBeInTheDocument();
     });
 
     // Verify the app renders with only the primary search input visible
@@ -117,11 +124,12 @@ WKR_NR;WKR_NAME;LAND_NR;LAND_NAME;LAND_ABK
     expect(primarySelect).toBeInTheDocument();
 
     // Verify the "VERGLEICHSREGION" search input is NOT in the DOM
-    expect(screen.queryByRole('combobox', { name: 'Vergleichsregion (Optional)' })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('combobox', { name: 'Vergleichsregion (Optional)' }),
+    ).not.toBeInTheDocument();
 
     // Verify the "Keine Wahlregion ausgewählt" empty state is displayed
     expect(screen.getByText('Keine Wahlregion ausgewählt')).toBeInTheDocument();
-
 
     // 2. SELECT PRIMARY REGION
     // Open primary region dropdown
@@ -147,7 +155,6 @@ WKR_NR;WKR_NAME;LAND_NR;LAND_NAME;LAND_ABK
 
     // * The initial full-screen "Keine Wahlregion ausgewählt" empty state is replaced
     expect(screen.queryByText('Keine Wahlregion ausgewählt')).not.toBeInTheDocument();
-
 
     // 3. SELECT COMPARISON REGION
     // Open secondary comparison dropdown
@@ -180,7 +187,9 @@ WKR_NR;WKR_NAME;LAND_NR;LAND_NAME;LAND_ABK
 
     // Wait for the data loading to complete
     await waitFor(() => {
-      expect(screen.queryByText('Wahldaten werden verarbeitet und Ergebnisse geladen...')).not.toBeInTheDocument();
+      expect(
+        screen.queryByText('Wahldaten werden verarbeitet und Ergebnisse geladen...'),
+      ).not.toBeInTheDocument();
     });
 
     // Verify both MetadataHeaders render for pre-selected regions
@@ -199,7 +208,9 @@ WKR_NR;WKR_NAME;LAND_NR;LAND_NAME;LAND_ABK
     render(<App />);
 
     await waitFor(() => {
-      expect(screen.queryByText('Wahldaten werden verarbeitet und Ergebnisse geladen...')).not.toBeInTheDocument();
+      expect(
+        screen.queryByText('Wahldaten werden verarbeitet und Ergebnisse geladen...'),
+      ).not.toBeInTheDocument();
     });
 
     // Find and click the global reset/clear button
@@ -223,7 +234,9 @@ WKR_NR;WKR_NAME;LAND_NR;LAND_NAME;LAND_ABK
     render(<App />);
 
     await waitFor(() => {
-      expect(screen.queryByText('Wahldaten werden verarbeitet und Ergebnisse geladen...')).not.toBeInTheDocument();
+      expect(
+        screen.queryByText('Wahldaten werden verarbeitet und Ergebnisse geladen...'),
+      ).not.toBeInTheDocument();
     });
 
     // Find and click the swap button

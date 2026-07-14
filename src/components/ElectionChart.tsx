@@ -1,19 +1,11 @@
 import { useState, useEffect } from 'react';
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Cell,
-  LabelList
-} from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Cell, LabelList } from 'recharts';
 import {
   ChartContainer,
   ChartTooltip,
   ChartLegend,
   ChartLegendContent,
-  type ChartConfig
+  type ChartConfig,
 } from './ui/chart';
 import type { GebietErgebnis } from '../domain/types';
 import { getPartyColor } from '../domain/partyColors';
@@ -48,9 +40,8 @@ const ESTABLISHED_PARTIES = new Set([
   'AFD',
   'DIE LINKE',
   'LINKE',
-  'BSW'
+  'BSW',
 ]);
-
 
 interface CustomLabelProps {
   x?: number | string;
@@ -62,9 +53,10 @@ interface CustomLabelProps {
 const renderCustomLabel = (props: CustomLabelProps) => {
   const { x = 0, y = 0, width = 0, value } = props;
   const offset = 8;
-  const displayValue = typeof value === 'number' 
-    ? `${(Math.floor(value * 10) / 10).toFixed(1)}`.replace('.', ',')
-    : '';
+  const displayValue =
+    typeof value === 'number'
+      ? `${(Math.floor(value * 10) / 10).toFixed(1)}`.replace('.', ',')
+      : '';
 
   return (
     <g>
@@ -96,15 +88,20 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
   }, []);
 
   // 1. Determine which parties to show as major parties and aggregate the rest into "Sonstige"
-  const isMajorParty = (p: { parteiKurz: string; parteiLang: string; zweitstimmenRelativ: number }) => {
-    const isEstablished = ESTABLISHED_PARTIES.has(p.parteiKurz.toUpperCase()) || 
-                          ESTABLISHED_PARTIES.has(p.parteiLang.toUpperCase());
+  const isMajorParty = (p: {
+    parteiKurz: string;
+    parteiLang: string;
+    zweitstimmenRelativ: number;
+  }) => {
+    const isEstablished =
+      ESTABLISHED_PARTIES.has(p.parteiKurz.toUpperCase()) ||
+      ESTABLISHED_PARTIES.has(p.parteiLang.toUpperCase());
     const isHighPerformer = p.zweitstimmenRelativ >= 3.0;
     return isEstablished || isHighPerformer;
   };
 
   const majorPartiesSet = new Set<string>();
-  
+
   data.parteien.forEach((p) => {
     if (isMajorParty(p)) {
       majorPartiesSet.add(p.parteiKurz);
@@ -208,8 +205,6 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
     return `${sign}${delta.toFixed(2)}%`;
   };
 
-
-
   // For the screen-reader only table, we list ALL parties in descending order of votes
   const allPartiesList = [...primaryParties];
   if (compareWith) {
@@ -287,7 +282,11 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
                 tickFormatter={(value) => `${Math.floor(value)}`}
               />
               <ChartTooltip
-                content={({ active, payload, label }: {
+                content={({
+                  active,
+                  payload,
+                  label,
+                }: {
                   active?: boolean;
                   payload?: readonly {
                     value?: number | string | readonly (number | string)[];
@@ -307,25 +306,36 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
                       } else {
                         const match = primaryParties.find((p) => p.parteiKurz === chartItem.party);
                         if (match) {
-                          deltaStr = formatDelta(match.zweitstimmenRelativ, match.zweitstimmenRelativ2021);
+                          deltaStr = formatDelta(
+                            match.zweitstimmenRelativ,
+                            match.zweitstimmenRelativ2021,
+                          );
                         }
                       }
                     }
 
                     return (
                       <div className="grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs shadow-xl text-slate-800 pointer-events-none">
-                        <p className="font-semibold text-slate-800 border-b border-slate-100 pb-1 mb-1">{label}</p>
+                        <p className="font-semibold text-slate-800 border-b border-slate-100 pb-1 mb-1">
+                          {label}
+                        </p>
                         <div className="grid gap-1.5">
                           <div>
                             {!isSingleMode && (
-                              <p className="text-[10px] text-slate-500 uppercase font-medium">{name1}</p>
+                              <p className="text-[10px] text-slate-500 uppercase font-medium">
+                                {name1}
+                              </p>
                             )}
                             <p className="leading-tight flex items-baseline gap-1.5">
                               <span className="font-mono font-medium text-slate-800 text-sm">
-                                {payload[0].value !== undefined ? formatFloorPercentage(Number(payload[0].value)) : ''}
+                                {payload[0].value !== undefined
+                                  ? formatFloorPercentage(Number(payload[0].value))
+                                  : ''}
                               </span>
                               {isSingleMode && deltaStr && (
-                                <span className={`text-[10px] font-semibold ${deltaStr.startsWith('+') ? 'text-emerald-600' : 'text-rose-600'}`}>
+                                <span
+                                  className={`text-[10px] font-semibold ${deltaStr.startsWith('+') ? 'text-emerald-600' : 'text-rose-600'}`}
+                                >
                                   ({deltaStr})
                                 </span>
                               )}
@@ -336,10 +346,14 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
                           </div>
                           {!isSingleMode && compareWith && payload[1] && (
                             <div className="border-t border-slate-100 pt-1.5">
-                              <p className="text-[10px] text-slate-500 uppercase font-medium">{name2}</p>
+                              <p className="text-[10px] text-slate-500 uppercase font-medium">
+                                {name2}
+                              </p>
                               <p className="leading-tight flex items-baseline gap-1.5">
                                 <span className="font-mono font-medium text-slate-800 text-sm">
-                                  {payload[1].value !== undefined ? formatFloorPercentage(Number(payload[1].value)) : ''}
+                                  {payload[1].value !== undefined
+                                    ? formatFloorPercentage(Number(payload[1].value))
+                                    : ''}
                                 </span>
                                 <span className="text-[10px] text-slate-500">
                                   ({payload[1].payload?.votes2?.toLocaleString('de-DE')} Stimmen)
@@ -356,39 +370,23 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
                 cursor={{ fill: '#f8fafc' }}
                 position={{ y: 10 }}
               />
-              {!compareWith ? null : (
-                <ChartLegend content={<ChartLegendContent />} />
-              )}
-              
+              {!compareWith ? null : <ChartLegend content={<ChartLegendContent />} />}
+
               {/* Primary region bar - rendered first */}
               <Bar name={name1} dataKey="percentage1" radius={[4, 4, 0, 0]} fill="#475569">
                 {chartItems.map((entry, index) => (
-                  <Cell
-                    key={`cell-1-${index}`}
-                    fill={entry.partyColor}
-                    fillOpacity={1.0}
-                  />
+                  <Cell key={`cell-1-${index}`} fill={entry.partyColor} fillOpacity={1.0} />
                 ))}
-                <LabelList
-                  dataKey="percentage1"
-                  content={renderCustomLabel}
-                />
+                <LabelList dataKey="percentage1" content={renderCustomLabel} />
               </Bar>
 
               {/* Comparison region bar (only if compareWith is present) - rendered second */}
               {compareWith && (
                 <Bar name={name2} dataKey="percentage2" radius={[4, 4, 0, 0]} fill="#cbd5e1">
                   {chartItems.map((entry, index) => (
-                    <Cell
-                      key={`cell-2-${index}`}
-                      fill={entry.partyColor}
-                      fillOpacity={0.4}
-                    />
+                    <Cell key={`cell-2-${index}`} fill={entry.partyColor} fillOpacity={0.4} />
                   ))}
-                  <LabelList
-                    dataKey="percentage2"
-                    content={renderCustomLabel}
-                  />
+                  <LabelList dataKey="percentage2" content={renderCustomLabel} />
                 </Bar>
               )}
             </BarChart>
@@ -423,9 +421,7 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
                   <td>{p.zweitstimmenAbsolut.toLocaleString('de-DE')}</td>
                   <td>{p.zweitstimmenRelativ.toLocaleString('de-DE')}%</td>
                   {!compareWith && (
-                    <td>
-                      {formatDelta(p.zweitstimmenRelativ, p.zweitstimmenRelativ2021)}
-                    </td>
+                    <td>{formatDelta(p.zweitstimmenRelativ, p.zweitstimmenRelativ2021)}</td>
                   )}
                   {compareWith && (
                     <>

@@ -1,7 +1,7 @@
-import { defineConfig } from 'vitest/config'
-import react, { reactCompilerPreset } from '@vitejs/plugin-react'
-import babel from '@rolldown/plugin-babel'
-import path from 'path'
+import { defineConfig } from 'vitest/config';
+import react, { reactCompilerPreset } from '@vitejs/plugin-react';
+import babel from '@rolldown/plugin-babel';
+import path from 'path';
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -21,4 +21,4 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: './src/test/setup.ts',
   },
-})
+});

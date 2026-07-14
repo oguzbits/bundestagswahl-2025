@@ -12,7 +12,7 @@ export const ESTABLISHED_PARTIES = new Set([
   'AFD',
   'DIE LINKE',
   'LINKE',
-  'BSW'
+  'BSW',
 ]);
 
 /**
@@ -38,14 +38,17 @@ export interface PartitionedParties {
 }
 
 export function consolidateUnion(parties: ParteiErgebnis[]): ParteiErgebnis[] {
-  const cdu = parties.find(p => p.parteiKurz.toUpperCase() === 'CDU');
-  const csu = parties.find(p => p.parteiKurz.toUpperCase() === 'CSU');
+  const cdu = parties.find((p) => p.parteiKurz.toUpperCase() === 'CDU');
+  const csu = parties.find((p) => p.parteiKurz.toUpperCase() === 'CSU');
   if (!cdu && !csu) return parties;
 
   const unionAbs = (cdu?.zweitstimmenAbsolut || 0) + (csu?.zweitstimmenAbsolut || 0);
   const unionAbs2021 = (cdu?.zweitstimmenAbsolut2021 || 0) + (csu?.zweitstimmenAbsolut2021 || 0);
-  const unionRel = Math.round(((cdu?.zweitstimmenRelativ || 0) + (csu?.zweitstimmenRelativ || 0)) * 100) / 100;
-  const unionRel2021 = Math.round(((cdu?.zweitstimmenRelativ2021 || 0) + (csu?.zweitstimmenRelativ2021 || 0)) * 100) / 100;
+  const unionRel =
+    Math.round(((cdu?.zweitstimmenRelativ || 0) + (csu?.zweitstimmenRelativ || 0)) * 100) / 100;
+  const unionRel2021 =
+    Math.round(((cdu?.zweitstimmenRelativ2021 || 0) + (csu?.zweitstimmenRelativ2021 || 0)) * 100) /
+    100;
 
   const merged: ParteiErgebnis = {
     parteiKurz: 'CDU/CSU',
@@ -56,7 +59,7 @@ export function consolidateUnion(parties: ParteiErgebnis[]): ParteiErgebnis[] {
     zweitstimmenRelativ2021: unionRel2021,
   };
 
-  const filtered = parties.filter(p => {
+  const filtered = parties.filter((p) => {
     const nameUpper = p.parteiKurz.toUpperCase();
     return nameUpper !== 'CDU' && nameUpper !== 'CSU';
   });
@@ -74,8 +77,9 @@ export function partitionParties(parties: ParteiErgebnis[]): PartitionedParties 
   const minorParties: ParteiErgebnis[] = [];
 
   consolidated.forEach((p) => {
-    const isEstablished = ESTABLISHED_PARTIES.has(p.parteiKurz.toUpperCase()) || 
-                          ESTABLISHED_PARTIES.has(p.parteiLang.toUpperCase());
+    const isEstablished =
+      ESTABLISHED_PARTIES.has(p.parteiKurz.toUpperCase()) ||
+      ESTABLISHED_PARTIES.has(p.parteiLang.toUpperCase());
     const isHighPerformer = p.zweitstimmenRelativ >= 3.0;
 
     if (isEstablished || isHighPerformer) {
@@ -100,14 +104,17 @@ export function partitionParties(parties: ParteiErgebnis[]): PartitionedParties 
   sonstigeRelativ = Math.round(sonstigeRelativ * 100) / 100;
   sonstigeRelativ2021 = Math.round(sonstigeRelativ2021 * 100) / 100;
 
-  const sonstigeRow: ParteiErgebnis | null = minorParties.length > 0 ? {
-    parteiKurz: 'Sonstige',
-    parteiLang: 'Sonstige Parteien unter 3.0%',
-    zweitstimmenAbsolut: sonstigeAbsolut,
-    zweitstimmenRelativ: sonstigeRelativ,
-    zweitstimmenAbsolut2021: sonstigeAbsolut2021,
-    zweitstimmenRelativ2021: sonstigeRelativ2021,
-  } : null;
+  const sonstigeRow: ParteiErgebnis | null =
+    minorParties.length > 0
+      ? {
+          parteiKurz: 'Sonstige',
+          parteiLang: 'Sonstige Parteien unter 3.0%',
+          zweitstimmenAbsolut: sonstigeAbsolut,
+          zweitstimmenRelativ: sonstigeRelativ,
+          zweitstimmenAbsolut2021: sonstigeAbsolut2021,
+          zweitstimmenRelativ2021: sonstigeRelativ2021,
+        }
+      : null;
 
   const displayList = [...primaryParties];
   if (sonstigeRow) {

@@ -135,16 +135,16 @@ Nr;Gebiet;gehört zu;Gewählt;Wahlberechtigte;;;;Wählende;;;;Ungültige Stimmen
 `;
     const results = parseElectionData(bswMockKerg, bswMockParteien, mockWahlkreiseCsv);
     const bund = results['99'];
-    const bsw = bund.parteien.find(p => p.parteiKurz === 'BSW');
-    const pty = bund.parteien.find(p => p.parteiKurz === 'PTY');
-    
+    const bsw = bund.parteien.find((p) => p.parteiKurz === 'BSW');
+    const pty = bund.parteien.find((p) => p.parteiKurz === 'PTY');
+
     expect(bsw).toBeDefined();
     expect(pty).toBeDefined();
-    
+
     // 4981 / 100000 * 100 = 4.981%, should round to exactly 4.98%
     expect(bsw?.zweitstimmenRelativ).toBe(4.98);
     expect(bsw?.zweitstimmenRelativ).not.toBe(5.0);
-    
+
     // 4989 / 100000 * 100 = 4.989%, should round to exactly 4.99%
     expect(pty?.zweitstimmenRelativ).toBe(4.99);
     expect(pty?.zweitstimmenRelativ).not.toBe(5.0);
@@ -191,9 +191,9 @@ Nr;Gebiet;gehört zu;Gewählt;Wahlberechtigte;;;;Wählende;;;;Ungültige Stimmen
     const results = parseElectionData(mockKerg, mockParteien, mockWahlkreiseCsv);
     const bund = results['99'];
 
-    const pA = bund.parteien.find(p => p.parteiKurz === 'ParteiA');
-    const pB = bund.parteien.find(p => p.parteiKurz === 'ParteiB');
-    const pC = bund.parteien.find(p => p.parteiKurz === 'ParteiC');
+    const pA = bund.parteien.find((p) => p.parteiKurz === 'ParteiA');
+    const pB = bund.parteien.find((p) => p.parteiKurz === 'ParteiB');
+    const pC = bund.parteien.find((p) => p.parteiKurz === 'ParteiC');
 
     expect(pA?.zweitstimmenRelativ).toBe(33.33);
     expect(pB?.zweitstimmenRelativ).toBe(33.33);

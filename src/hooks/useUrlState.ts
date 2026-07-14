@@ -13,7 +13,7 @@ export function useUrlState() {
   const [gebiet2Id, setGebiet2IdState] = useState<string | null>(() => {
     const g1 = getUrlParam('gebiet1');
     const g2 = getUrlParam('gebiet2');
-    return (g1 && g1 === g2) ? null : g2;
+    return g1 && g1 === g2 ? null : g2;
   });
 
   const handleUrlChange = () => {
@@ -44,7 +44,7 @@ export function useUrlState() {
     }
     const newSearch = params.toString();
     const newUrl = `${window.location.pathname}${newSearch ? `?${newSearch}` : ''}`;
-    
+
     window.history.pushState(null, '', newUrl);
     window.dispatchEvent(new Event(URL_CHANGE_EVENT));
   };
@@ -63,7 +63,7 @@ export function useUrlState() {
     }
     const newSearch = params.toString();
     const newUrl = `${window.location.pathname}${newSearch ? `?${newSearch}` : ''}`;
-    
+
     window.history.pushState(null, '', newUrl);
     window.dispatchEvent(new Event(URL_CHANGE_EVENT));
   };
@@ -90,13 +90,13 @@ export function useUrlState() {
     const params = new URLSearchParams(window.location.search);
     const g1 = params.get('gebiet1');
     const g2 = params.get('gebiet2');
-    
+
     if (g1) {
       params.set('gebiet2', g1);
     } else {
       params.delete('gebiet2');
     }
-    
+
     if (g2) {
       params.set('gebiet1', g2);
     } else {

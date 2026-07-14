@@ -8,9 +8,16 @@ import type { GebietErgebnis } from '../domain/types';
 // Mock Recharts components to allow direct inspection of props passed to them in JSDOM
 vi.mock('recharts', () => {
   return {
-    ResponsiveContainer: ({ children }: any) => <div data-testid="responsive-container">{children}</div>,
+    ResponsiveContainer: ({ children }: any) => (
+      <div data-testid="responsive-container">{children}</div>
+    ),
     BarChart: ({ children, barGap, data, margin }: any) => (
-      <div data-testid="bar-chart" data-bargap={barGap} data-margin={JSON.stringify(margin)} data-chartdata={JSON.stringify(data)}>
+      <div
+        data-testid="bar-chart"
+        data-bargap={barGap}
+        data-margin={JSON.stringify(margin)}
+        data-chartdata={JSON.stringify(data)}
+      >
         {children}
       </div>
     ),
@@ -24,8 +31,8 @@ vi.mock('recharts', () => {
     ),
     XAxis: () => <div data-testid="x-axis" />,
     YAxis: ({ tickFormatter, domain }: any) => (
-      <div 
-        data-testid="y-axis" 
+      <div
+        data-testid="y-axis"
         data-domain={JSON.stringify(domain)}
         data-formatted-value-test={tickFormatter ? tickFormatter(32) : undefined}
       />
@@ -87,7 +94,7 @@ const mockGebiet1: GebietErgebnis = {
       zweitstimmenRelativ: 1.9,
       zweitstimmenAbsolut2021: 10,
       zweitstimmenRelativ2021: 1.7,
-    }
+    },
   ],
 };
 
@@ -134,19 +141,13 @@ const mockGebiet2: GebietErgebnis = {
       zweitstimmenRelativ: 0.6,
       zweitstimmenAbsolut2021: 5,
       zweitstimmenRelativ2021: 0.6,
-    }
+    },
   ],
 };
 
 describe('ElectionChart Component', () => {
   it('correctly aggregates data matching the list logic (major/established + Sonstige)', () => {
-    render(
-      <ElectionChart
-        data={mockGebiet1}
-        compareWith={mockGebiet2}
-        title="Test Vergleich"
-      />
-    );
+    render(<ElectionChart data={mockGebiet1} compareWith={mockGebiet2} title="Test Vergleich" />);
 
     const chartEl = screen.getByTestId('bar-chart');
     const chartDataRaw = chartEl.getAttribute('data-chartdata');
@@ -166,52 +167,54 @@ describe('ElectionChart Component', () => {
 
     // Dynamically calculate expected Sonstige values
     const ESTABLISHED_PARTIES = new Set([
-      'CDU', 'CSU', 'CDU/CSU', 'SPD', 'GRÜNE', 'GRÜNEN', 'BÜNDNIS 90/DIE GRÜNEN', 'FDP', 'AFD', 'DIE LINKE', 'LINKE', 'BSW'
+      'CDU',
+      'CSU',
+      'CDU/CSU',
+      'SPD',
+      'GRÜNE',
+      'GRÜNEN',
+      'BÜNDNIS 90/DIE GRÜNEN',
+      'FDP',
+      'AFD',
+      'DIE LINKE',
+      'LINKE',
+      'BSW',
     ]);
     const isMajorParty = (p: any) => {
-      const isEstablished = ESTABLISHED_PARTIES.has(p.parteiKurz.toUpperCase()) || 
-                            ESTABLISHED_PARTIES.has(p.parteiLang.toUpperCase());
+      const isEstablished =
+        ESTABLISHED_PARTIES.has(p.parteiKurz.toUpperCase()) ||
+        ESTABLISHED_PARTIES.has(p.parteiLang.toUpperCase());
       const isHighPerformer = p.zweitstimmenRelativ >= 3.0;
       return isEstablished || isHighPerformer;
     };
 
-    const expectedSonstige1 = Math.round(
-      mockGebiet1.parteien
-        .filter((p) => !isMajorParty(p))
-        .reduce((sum, p) => sum + p.zweitstimmenRelativ, 0) * 100
-    ) / 100;
+    const expectedSonstige1 =
+      Math.round(
+        mockGebiet1.parteien
+          .filter((p) => !isMajorParty(p))
+          .reduce((sum, p) => sum + p.zweitstimmenRelativ, 0) * 100,
+      ) / 100;
 
-    const expectedSonstige2 = Math.round(
-      mockGebiet2.parteien
-        .filter((p) => !isMajorParty(p))
-        .reduce((sum, p) => sum + p.zweitstimmenRelativ, 0) * 100
-    ) / 100;
+    const expectedSonstige2 =
+      Math.round(
+        mockGebiet2.parteien
+          .filter((p) => !isMajorParty(p))
+          .reduce((sum, p) => sum + p.zweitstimmenRelativ, 0) * 100,
+      ) / 100;
 
     expect(sonstige.percentage1).toBe(expectedSonstige1);
     expect(sonstige.percentage2).toBe(expectedSonstige2);
   });
 
   it('verifies that barGap={-10} is set on BarChart', () => {
-    render(
-      <ElectionChart
-        data={mockGebiet1}
-        compareWith={mockGebiet2}
-        title="Test Vergleich"
-      />
-    );
+    render(<ElectionChart data={mockGebiet1} compareWith={mockGebiet2} title="Test Vergleich" />);
 
     const chartEl = screen.getByTestId('bar-chart');
     expect(chartEl.getAttribute('data-bargap')).toBe('-6');
   });
 
   it('verifies visual styling properties (legend suffix and opacity mapping)', () => {
-    render(
-      <ElectionChart
-        data={mockGebiet1}
-        compareWith={mockGebiet2}
-        title="Test Vergleich"
-      />
-    );
+    render(<ElectionChart data={mockGebiet1} compareWith={mockGebiet2} title="Test Vergleich" />);
 
     const bars = screen.getAllByTestId('bar');
     expect(bars).toHaveLength(2);
@@ -236,12 +239,7 @@ describe('ElectionChart Component', () => {
   });
 
   it('verifies Y-axis margins, domain, and tick formatter', () => {
-    render(
-      <ElectionChart
-        data={mockGebiet1}
-        title="Test Y-Axis"
-      />
-    );
+    render(<ElectionChart data={mockGebiet1} title="Test Y-Axis" />);
 
     const chartEl = screen.getByTestId('bar-chart');
     const margin = JSON.parse(chartEl.getAttribute('data-margin') || '{}');
@@ -253,13 +251,7 @@ describe('ElectionChart Component', () => {
   });
 
   it('verifies persistent LabelList components and their formatters', () => {
-    render(
-      <ElectionChart
-        data={mockGebiet1}
-        compareWith={mockGebiet2}
-        title="Test Labels"
-      />
-    );
+    render(<ElectionChart data={mockGebiet1} compareWith={mockGebiet2} title="Test Labels" />);
 
     const labelLists = screen.getAllByTestId('label-list');
     expect(labelLists).toHaveLength(2);
@@ -285,12 +277,7 @@ describe('ElectionChart Component', () => {
   });
 
   it('verifies that LabelList is responsive via Tailwind CSS classes', () => {
-    render(
-      <ElectionChart
-        data={mockGebiet1}
-        title="Test Responsive Labels"
-      />
-    );
+    render(<ElectionChart data={mockGebiet1} title="Test Responsive Labels" />);
 
     const labelList = screen.getByTestId('label-list');
     const textEl = labelList.querySelector('text');

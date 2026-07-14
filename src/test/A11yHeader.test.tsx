@@ -101,7 +101,7 @@ const mockGebiet: GebietErgebnis = {
       zweitstimmenRelativ: 1.35,
       zweitstimmenAbsolut2021: 8000,
       zweitstimmenRelativ2021: 1.08,
-    }
+    },
   ],
 };
 
@@ -114,7 +114,7 @@ describe('MetadataHeader Accessibility and Visual Layout', () => {
 
   it('renders accordion toggle button with accessibility attributes', () => {
     render(<MetadataHeader gebiet={mockGebiet} parentName={null} />);
-    
+
     const accordionBtn = screen.getByRole('button', { name: /Mehr Parteien anzeigen/i });
     expect(accordionBtn).toBeInTheDocument();
     expect(accordionBtn).toHaveAttribute('aria-expanded', 'false');

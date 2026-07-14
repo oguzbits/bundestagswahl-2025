@@ -41,9 +41,12 @@ export class ErrorBoundary extends Component<Props, State> {
       return (
         <div className="bg-red-50 border border-red-200 p-6 rounded-2xl max-w-xl mx-auto my-8 text-center shadow-sm">
           <div className="text-red-500 text-3xl mb-3">⚠️</div>
-          <h3 className="text-lg font-bold text-red-800">Ein unerwarteter Fehler ist aufgetreten</h3>
+          <h3 className="text-lg font-bold text-red-800">
+            Ein unerwarteter Fehler ist aufgetreten
+          </h3>
           <p className="text-sm text-red-600 mt-2 leading-relaxed">
-            {this.state.error.message || 'Die Anwendung konnte an dieser Stelle nicht geladen werden.'}
+            {this.state.error.message ||
+              'Die Anwendung konnte an dieser Stelle nicht geladen werden.'}
           </p>
           <div className="mt-5 flex justify-center gap-3">
             <button

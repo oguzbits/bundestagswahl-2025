@@ -65,7 +65,7 @@ WKR_NR;WKR_NAME;LAND_NR;LAND_NAME;LAND_ABK
 
     expect(result.current.error).toBeNull();
     expect(result.current.data).not.toBeNull();
-    
+
     const bundesgebiet = result.current.data!['99'];
     expect(bundesgebiet).toBeDefined();
     expect(bundesgebiet.name).toBe('Bund');
