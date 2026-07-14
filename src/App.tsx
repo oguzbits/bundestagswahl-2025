@@ -4,7 +4,7 @@ import { Autocomplete } from './components/Autocomplete';
 import { MetadataHeader } from './components/MetadataHeader';
 import { ElectionChart } from './components/ElectionChart';
 import { RotateCcw, ArrowLeftRight } from 'lucide-react';
-import { ErrorBoundary } from './components/ErrorBoundary';
+import { ErrorBoundary } from './utils/ErrorBoundary';
 
 export default function App() {
   const { gebiet1Id, gebiet2Id, setGebiet1Id, setGebiet2Id, clearSelection, swapPositions } =
