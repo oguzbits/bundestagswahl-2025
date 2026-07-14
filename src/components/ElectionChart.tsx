@@ -222,35 +222,35 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
       }
 
       return (
-        <div className="bg-white p-4 border border-slate-200 rounded-xl shadow-lg text-sm max-w-sm">
-          <p className="font-bold text-slate-800 border-b border-slate-100 pb-1.5 mb-2">{label}</p>
-          <div className="space-y-2">
+        <div className="bg-white p-2.5 sm:p-4 border border-slate-200 rounded-xl shadow-lg text-xs sm:text-sm max-w-[240px] sm:max-w-sm pointer-events-none">
+          <p className="font-bold text-slate-800 border-b border-slate-100 pb-1 mb-1.5 sm:pb-1.5 sm:mb-2">{label}</p>
+          <div className="space-y-1.5 sm:space-y-2">
             <div>
               {!isSingleMode && (
-                <p className="font-semibold text-xs text-slate-500 uppercase tracking-wider">{name1}</p>
+                <p className="font-semibold text-[10px] sm:text-xs text-slate-500 uppercase tracking-wider">{name1}</p>
               )}
-              <p className="text-slate-800">
-                <span className="font-bold text-base">
+              <p className="text-slate-800 leading-tight">
+                <span className="font-bold text-sm sm:text-base">
                   {payload[0].value !== undefined ? formatFloorPercentage(Number(payload[0].value)) : ''}
                 </span>
                 {isSingleMode && deltaStr && (
-                  <span className={`text-xs font-semibold ml-2 ${deltaStr.startsWith('+') ? 'text-emerald-600' : 'text-rose-600'}`}>
+                  <span className={`text-[10px] sm:text-xs font-semibold ml-1.5 ${deltaStr.startsWith('+') ? 'text-emerald-600' : 'text-rose-600'}`}>
                     ({deltaStr})
                   </span>
                 )}
-                <span className="text-xs text-slate-500 ml-1.5 block sm:inline">
+                <span className="text-[10px] sm:text-xs text-slate-500 ml-1 block sm:inline">
                   ({chartItem.votes1.toLocaleString('de-DE')} Stimmen)
                 </span>
               </p>
             </div>
             {!isSingleMode && compareWith && payload[1] && (
-              <div className="border-t border-slate-100 pt-2">
-                <p className="font-semibold text-xs text-slate-500 uppercase tracking-wider">{name2}</p>
-                <p className="text-slate-800">
-                  <span className="font-bold text-base">
+              <div className="border-t border-slate-100 pt-1.5 sm:pt-2">
+                <p className="font-semibold text-[10px] sm:text-xs text-slate-500 uppercase tracking-wider">{name2}</p>
+                <p className="text-slate-800 leading-tight">
+                  <span className="font-bold text-sm sm:text-base">
                     {payload[1].value !== undefined ? formatFloorPercentage(Number(payload[1].value)) : ''}
                   </span>
-                  <span className="text-xs text-slate-500 ml-1.5 block sm:inline">
+                  <span className="text-[10px] sm:text-xs text-slate-500 ml-1 block sm:inline">
                     ({(payload[1].payload as ChartDataItem).votes2?.toLocaleString('de-DE')} Stimmen)
                   </span>
                 </p>
@@ -328,7 +328,7 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
                 domain={[0, 'auto']}
                 tickFormatter={(value) => `${Math.floor(value)}`}
               />
-              <Tooltip content={<CustomTooltip />} cursor={{ fill: '#f8fafc' }} />
+              <Tooltip content={<CustomTooltip />} cursor={{ fill: '#f8fafc' }} position={{ y: 10 }} />
               {!compareWith ? null : (
                 <Legend
                   verticalAlign="bottom"
