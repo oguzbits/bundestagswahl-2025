@@ -263,6 +263,14 @@ function ChartLegendContent({
     return null;
   }
 
+  const sortedPayload = [...payload].sort((a, b) => {
+    const keyA = String(a.dataKey || '');
+    const keyB = String(b.dataKey || '');
+    if (keyA.endsWith('1') && keyB.endsWith('2')) return -1;
+    if (keyA.endsWith('2') && keyB.endsWith('1')) return 1;
+    return 0;
+  });
+
   return (
     <div
       className={cn(
@@ -271,7 +279,7 @@ function ChartLegendContent({
         className,
       )}
     >
-      {payload
+      {sortedPayload
         .filter((item) => item.type !== 'none')
         .map((item, index) => {
           const key = `${nameKey ?? item.dataKey ?? 'value'}`;
