@@ -49,14 +49,8 @@ export const formatFloorPercentage = (value: number): string => {
   return `${(Math.floor(value * 10) / 10).toFixed(1)}%`;
 };
 
-interface CustomLabelProps {
-  x?: number;
-  y?: number;
-  width?: number;
-  value?: number | string;
-}
 
-const renderCustomLabel = (props: CustomLabelProps) => {
+const renderCustomLabel = (props: any) => {
   const { x = 0, y = 0, width = 0, value } = props;
   const offset = 8;
   const displayValue = typeof value === 'number' ? formatFloorPercentage(value) : '';

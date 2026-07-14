@@ -3,6 +3,8 @@ import type { GebietErgebnis, ParteiErgebnis } from '../domain/types';
 import { cn } from '../lib/utils';
 import { getPartyColor } from '../domain/partyColors';
 import { ChevronDown, ChevronUp } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+
 
 export interface MetadataHeaderProps {
   gebiet: GebietErgebnis;
@@ -100,8 +102,63 @@ export function MetadatenHeader({ gebiet, parentName }: MetadataHeaderProps) {
     return b.zweitstimmenRelativ - a.zweitstimmenRelativ;
   });
 
-  // Sort minorParties descending for the accordion view
-  const sortedMinorParties = [...minorParties].sort((a, b) => b.zweitstimmenRelativ - a.zweitstimmenRelativ);
+  // Sort minorParties descending for the accordion view; exclude parties with no votes
+  const sortedAndFilteredMinorParties = [...minorParties]
+    .filter((p) => p.zweitstimmenAbsolut > 0)
+    .sort((a, b) => b.zweitstimmenRelativ - a.zweitstimmenRelativ);
+
+  const renderPartyRow = (p: ParteiErgebnis) => {
+    const deltaInfo = formatDeltaInfo(p.zweitstimmenRelativ, p.zweitstimmenRelativ2021);
+    const partyColor = getPartyColor(p.parteiKurz);
+    
+    return (
+      <div key={p.parteiKurz} className="group p-2.5 rounded-xl hover:bg-slate-50 transition-all border border-transparent hover:border-slate-100 flex flex-col space-y-1.5">
+        {/* LINE 1 */}
+        <div className="flex justify-between items-center">
+          {/* Left: Colored dot + Party short name in bold */}
+          <div className="flex items-center space-x-2">
+            <span 
+              className="w-3 h-3 rounded-full shrink-0 border border-black/10 shadow-sm"
+              style={{ backgroundColor: partyColor }}
+            />
+            <span className="font-semibold text-sm text-slate-800">{p.parteiKurz}</span>
+          </div>
+          {/* Right: Current relative percentage (bold) + its dynamic 2021 delta in parentheses */}
+          <div className="flex items-center space-x-1.5 font-mono">
+            <span className="font-bold text-sm text-slate-900">
+              {p.zweitstimmenRelativ.toFixed(2)}%
+            </span>
+            <span className={cn("text-xs font-semibold", deltaInfo.className)}>
+              ({deltaInfo.text})
+            </span>
+          </div>
+        </div>
+
+        {/* LINE 2 */}
+        <div className="flex justify-between items-center text-xs text-slate-500">
+          {/* Left: Full official party name */}
+          <span className="truncate mr-4" title={p.parteiLang}>
+            {p.parteiLang}
+          </span>
+          {/* Right: Absolute votes formatted with thousands separators followed by the word "Stimmen" */}
+          <span className="font-mono shrink-0">
+            {p.zweitstimmenAbsolut.toLocaleString('de-DE')} Stimmen
+          </span>
+        </div>
+
+        {/* Progress Bar */}
+        <div className="w-full bg-slate-100 rounded-full h-1 mt-1 overflow-hidden">
+          <div
+            className="h-full rounded-full transition-all duration-500"
+            style={{ 
+              width: `${p.zweitstimmenRelativ}%`,
+              backgroundColor: partyColor
+            }}
+          />
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden transition-all hover:shadow-lg">
@@ -160,112 +217,41 @@ export function MetadatenHeader({ gebiet, parentName }: MetadataHeaderProps) {
             <span className="font-mono">Gültig: {gebiet.gueltigeZweitstimmen.toLocaleString('de-DE')}</span>
           </h4>
 
-          {/* Clean Main List */}
+          {/* SECTION 1: STATIC MAIN LIST (Always Visible) */}
           <div className="space-y-3">
-            {displayList.map((p) => {
-              const deltaInfo = formatDeltaInfo(p.zweitstimmenRelativ, p.zweitstimmenRelativ2021);
-              const partyColor = getPartyColor(p.parteiKurz);
-              
-              return (
-                <div key={p.parteiKurz} className="group p-2.5 rounded-xl hover:bg-slate-50 transition-all border border-transparent hover:border-slate-100 flex flex-col space-y-1.5">
-                  {/* LINE 1 */}
-                  <div className="flex justify-between items-center">
-                    {/* Left: Colored dot + Party short name in bold */}
-                    <div className="flex items-center space-x-2">
-                      <span 
-                        className="w-3 h-3 rounded-full shrink-0 border border-black/10 shadow-sm"
-                        style={{ backgroundColor: partyColor }}
-                      />
-                      <span className="font-semibold text-sm text-slate-800">{p.parteiKurz}</span>
-                    </div>
-                    {/* Right: Current relative percentage (bold) + its dynamic 2021 delta in parentheses */}
-                    <div className="flex items-center space-x-1.5 font-mono">
-                      <span className="font-bold text-sm text-slate-900">
-                        {p.zweitstimmenRelativ.toFixed(2)}%
-                      </span>
-                      <span className={cn("text-xs font-semibold", deltaInfo.className)}>
-                        ({deltaInfo.text})
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* LINE 2 */}
-                  <div className="flex justify-between items-center text-xs text-slate-500">
-                    {/* Left: Full official party name */}
-                    <span className="truncate mr-4" title={p.parteiLang}>
-                      {p.parteiLang}
-                    </span>
-                    {/* Right: Absolute votes formatted with thousands separators followed by the word "Stimmen" */}
-                    <span className="font-mono shrink-0">
-                      {p.zweitstimmenAbsolut.toLocaleString('de-DE')} Stimmen
-                    </span>
-                  </div>
-
-                  {/* Progress Bar */}
-                  <div className="w-full bg-slate-100 rounded-full h-1 mt-1 overflow-hidden">
-                    <div
-                      className="h-full rounded-full transition-all duration-500"
-                      style={{ 
-                        width: `${p.zweitstimmenRelativ}%`,
-                        backgroundColor: partyColor
-                      }}
-                    />
-                  </div>
-                </div>
-              );
-            })}
+            {displayList.map((p) => renderPartyRow(p))}
           </div>
 
-          {/* Toggle Accordion for micro-parties */}
-          {sortedMinorParties.length > 0 && (
+          {/* SECTION 2 + 3: SHADCN POPOVER — portal-rendered, zero layout shift */}
+          {sortedAndFilteredMinorParties.length > 0 && (
             <div className="mt-4 border-t border-slate-100 pt-3">
-              <button
-                onClick={() => setShowAll(!showAll)}
-                aria-expanded={showAll}
-                aria-controls={`minor-parties-${gebiet.id}`}
-                className="w-full py-2 px-3 flex items-center justify-between text-xs font-semibold text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-xl transition-all border border-slate-200 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-              >
-                <span>{showAll ? 'Weniger anzeigen' : 'Alle Parteien anzeigen'}</span>
-                {showAll ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-              </button>
+              <Popover open={showAll} onOpenChange={setShowAll}>
+                {/* Section 2: Trigger button */}
+                <PopoverTrigger
+                  render={
+                    <button
+                      aria-expanded={showAll}
+                      aria-controls={`minor-parties-${gebiet.id}`}
+                      className="w-full py-2 px-3 flex items-center justify-between text-xs font-semibold text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-xl transition-all border border-slate-200 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                    >
+                      <span>{showAll ? 'Weniger anzeigen' : 'Alle Parteien anzeigen'}</span>
+                      {showAll ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                    </button>
+                  }
+                />
 
-              {showAll && (
-                <div 
-                  id={`minor-parties-${gebiet.id}`}
-                  className="mt-3 space-y-2.5 max-h-60 overflow-y-auto pr-1 animate-in fade-in slide-in-from-top-1 duration-200"
+                {/* Section 3: Portal-rendered overlay — floats above all content */}
+                <PopoverContent
+                  align="start"
+                  side="bottom"
+                  sideOffset={8}
+                  className="w-[var(--anchor-width)] max-h-[250px] overflow-y-auto p-3 space-y-3 bg-white border border-slate-200 rounded-xl shadow-xl scrollbar-thin"
                 >
-                  {sortedMinorParties.map((p) => {
-                    const deltaInfo = formatDeltaInfo(p.zweitstimmenRelativ, p.zweitstimmenRelativ2021);
-                    const partyColor = getPartyColor(p.parteiKurz);
-
-                    return (
-                      <div key={p.parteiKurz} className="flex justify-between items-center text-xs font-medium py-1 px-1.5 hover:bg-slate-50 rounded-lg">
-                        <span className="flex items-center space-x-2 truncate mr-4">
-                          <span 
-                            className="w-2.5 h-2.5 rounded-full shrink-0 border border-black/10 shadow-sm"
-                            style={{ backgroundColor: partyColor }}
-                          />
-                          <span className="font-bold text-slate-700">{p.parteiKurz}</span>
-                          <span className="text-[10px] text-slate-400 font-normal truncate hidden sm:inline" title={p.parteiLang}>
-                            {p.parteiLang}
-                          </span>
-                        </span>
-                        <div className="flex items-center space-x-1.5 shrink-0">
-                          <span className="text-slate-800 font-bold font-mono">
-                            {p.zweitstimmenRelativ.toFixed(2)}%
-                          </span>
-                          <span className={cn("text-[10px] font-mono", deltaInfo.className)}>
-                            ({deltaInfo.text})
-                          </span>
-                          <span className="text-[10px] text-slate-400 font-mono">
-                            {p.zweitstimmenAbsolut.toLocaleString('de-DE')}
-                          </span>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
+                  <div id={`minor-parties-${gebiet.id}`}>
+                    {sortedAndFilteredMinorParties.map((p) => renderPartyRow(p))}
+                  </div>
+                </PopoverContent>
+              </Popover>
             </div>
           )}
         </div>

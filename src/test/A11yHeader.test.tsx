@@ -81,7 +81,9 @@ const mockGebiet: GebietErgebnis = {
   wahlberechtigte: 1000000,
   waehler: 750000,
   wahlbeteiligung: 75,
+  wahlbeteiligung2021: 72.5,
   gueltigeZweitstimmen: 740000,
+  gueltigeZweitstimmen2021: 720000,
   parteien: [
     {
       parteiKurz: 'CSU',
