@@ -90,7 +90,7 @@ export default function App() {
                 </div>
 
                 {/* Elegant Swap Button in between Autocompletes */}
-                <div className="flex items-center justify-center h-11 pb-0.5">
+                <div className={`flex items-center justify-center h-11 pb-0.5 ${(!gebiet1Id || !gebiet2Id) ? 'hidden md:flex' : ''}`}>
                   {gebiet1Id && gebiet2Id ? (
                     <button
                       onClick={swapPositions}
