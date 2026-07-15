@@ -181,7 +181,7 @@ WKR_NR;WKR_NAME;LAND_NR;LAND_NAME;LAND_ABK
 
   it('loads pre-selected regions based on initial URL query parameters', async () => {
     // Set initial search parameters
-    window.location.search = '?gebiet1=99&gebiet2=11';
+    window.location.search = '?gebiet1=bundesgebiet&gebiet2=berlin';
 
     render(<App />);
 
@@ -203,7 +203,7 @@ WKR_NR;WKR_NAME;LAND_NR;LAND_NAME;LAND_ABK
 
   it('clears selection and returns to empty state when clicking the reset button', async () => {
     // Load with pre-selected regions
-    window.location.search = '?gebiet1=99&gebiet2=11';
+    window.location.search = '?gebiet1=bundesgebiet&gebiet2=berlin';
 
     render(<App />);
 
@@ -228,8 +228,8 @@ WKR_NR;WKR_NAME;LAND_NR;LAND_NAME;LAND_ABK
   });
 
   it('swaps primary and comparison regions when clicking the swap button', async () => {
-    // Load with pre-selected regions (gebiet1 = 99 (Bundesgebiet), gebiet2 = 11 (Berlin))
-    window.location.search = '?gebiet1=99&gebiet2=11';
+    // Load with pre-selected regions (gebiet1 = bundesgebiet, gebiet2 = berlin)
+    window.location.search = '?gebiet1=bundesgebiet&gebiet2=berlin';
 
     render(<App />);
 
@@ -246,9 +246,9 @@ WKR_NR;WKR_NAME;LAND_NR;LAND_NAME;LAND_ABK
 
     // Verify the query parameters are updated/swapped in the URL
     await waitFor(() => {
-      expect(window.location.search).toContain('gebiet1=11');
+      expect(window.location.search).toContain('gebiet1=berlin');
     });
-    expect(window.location.search).toContain('gebiet2=99');
+    expect(window.location.search).toContain('gebiet2=bundesgebiet');
 
     // Verify the comparison chart title reflects the swap: comparison order is reversed
     expect(screen.getByText('Vergleich: Berlin vs. Bundesgebiet')).toBeInTheDocument();

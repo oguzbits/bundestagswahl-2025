@@ -8,10 +8,10 @@ import type { GebietErgebnis } from '../domain/types';
 // Mock the hooks used in App.tsx
 vi.mock('../hooks/useUrlState', () => ({
   useUrlState: () => ({
-    gebiet1Id: '1',
-    gebiet2Id: '2',
-    setGebiet1Id: vi.fn(),
-    setGebiet2Id: vi.fn(),
+    gebiet1Name: 'Region Eins',
+    gebiet2Name: 'Region Zwei',
+    setGebiet1Name: vi.fn(),
+    setGebiet2Name: vi.fn(),
     clearSelection: vi.fn(),
     swapPositions: vi.fn(),
   }),
@@ -106,10 +106,9 @@ const mockGebiet: GebietErgebnis = {
 };
 
 describe('MetadataHeader Accessibility and Visual Layout', () => {
-  it('compiles and renders title, ID and stats correctly', () => {
+  it('compiles and renders title and stats correctly', () => {
     render(<MetadataHeader gebiet={mockGebiet} parentName={null} />);
     expect(screen.getByText('Bayern')).toBeInTheDocument();
-    expect(screen.getByText('ID: 09')).toBeInTheDocument();
   });
 
   it('renders accordion toggle button with accessibility attributes', () => {

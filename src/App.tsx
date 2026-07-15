@@ -7,13 +7,25 @@ import { RotateCcw, ArrowLeftRight } from 'lucide-react';
 import { ErrorBoundary } from './utils/ErrorBoundary';
 
 export default function App() {
-  const { gebiet1Id, gebiet2Id, setGebiet1Id, setGebiet2Id, clearSelection, swapPositions } =
-    useUrlState();
+  const {
+    gebiet1Name,
+    gebiet2Name,
+    setGebiet1Name,
+    setGebiet2Name,
+    clearSelection,
+    swapPositions,
+  } = useUrlState();
   const { data, isLoading, error, searchOptions } = useElectionData();
 
-  // Find the selected Gebiet in our map
-  const selectedGebiet1 = gebiet1Id && data ? data[gebiet1Id] : null;
-  const selectedGebiet2 = gebiet2Id && data ? data[gebiet2Id] : null;
+  // Find the selected Gebiet in our map by name (case-insensitive)
+  const selectedGebiet1 =
+    gebiet1Name && data
+      ? Object.values(data).find((g) => g.name.toLowerCase() === gebiet1Name.toLowerCase()) || null
+      : null;
+  const selectedGebiet2 =
+    gebiet2Name && data
+      ? Object.values(data).find((g) => g.name.toLowerCase() === gebiet2Name.toLowerCase()) || null
+      : null;
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans antialiased">
@@ -72,7 +84,7 @@ export default function App() {
                       Ergebnisse auf Bundes-, Landes- oder Wahlkreisebene erkunden
                     </p>
                   </div>
-                  {(gebiet1Id || gebiet2Id) && (
+                  {(gebiet1Name || gebiet2Name) && (
                     <div className="flex items-center gap-2">
                       <button
                         onClick={clearSelection}
@@ -92,12 +104,15 @@ export default function App() {
                   <div className="w-full">
                     <Autocomplete
                       options={
-                        gebiet2Id
-                          ? searchOptions.filter((opt) => opt.id !== gebiet2Id)
+                        selectedGebiet2
+                          ? searchOptions.filter((opt) => opt.id !== selectedGebiet2.id)
                           : searchOptions
                       }
-                      selectedId={gebiet1Id}
-                      onSelect={setGebiet1Id}
+                      selectedId={selectedGebiet1?.id || null}
+                      onSelect={(id) => {
+                        const name = id && data ? data[id].name.toLowerCase() : null;
+                        setGebiet1Name(name);
+                      }}
                       placeholder="Suchen Sie nach einem Wahlkreis, Land oder dem Bund..."
                       label="Primäre Region"
                     />
@@ -105,9 +120,9 @@ export default function App() {
 
                   {/* Elegant Swap Button in between Autocompletes */}
                   <div
-                    className={`flex items-center justify-center h-11 pb-0.5 ${!gebiet1Id || !gebiet2Id ? 'hidden md:flex' : ''}`}
+                    className={`flex items-center justify-center h-11 pb-0.5 ${!gebiet1Name || !gebiet2Name ? 'hidden md:flex' : ''}`}
                   >
-                    {gebiet1Id && gebiet2Id ? (
+                    {gebiet1Name && gebiet2Name ? (
                       <button
                         onClick={swapPositions}
                         title="Regionen tauschen"
@@ -123,11 +138,14 @@ export default function App() {
 
                   {/* Column 2 Autocomplete */}
                   <div className="w-full">
-                    {gebiet1Id ? (
+                    {gebiet1Name ? (
                       <Autocomplete
-                        options={searchOptions.filter((opt) => opt.id !== gebiet1Id)}
-                        selectedId={gebiet2Id}
-                        onSelect={setGebiet2Id}
+                        options={searchOptions.filter((opt) => opt.id !== selectedGebiet1?.id)}
+                        selectedId={selectedGebiet2?.id || null}
+                        onSelect={(id) => {
+                          const name = id && data ? data[id].name.toLowerCase() : null;
+                          setGebiet2Name(name);
+                        }}
                         placeholder="Vergleichsregion suchen..."
                         label="Vergleichsregion (Optional)"
                       />

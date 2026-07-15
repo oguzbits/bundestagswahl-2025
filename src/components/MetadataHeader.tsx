@@ -42,9 +42,6 @@ export function MetadatenHeader({ gebiet, parentName }: MetadataHeaderProps) {
             {parentName ? `Bundesland: ${parentName}` : '\u00A0'}
           </p>
         </div>
-        <span className="px-3 py-1.5 rounded-full text-xs font-bold bg-white/10 text-white border border-white/20 shrink-0 font-mono">
-          ID: {gebiet.id}
-        </span>
       </div>
 
       {/* Main Stats */}

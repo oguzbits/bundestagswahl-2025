@@ -9,8 +9,8 @@ function getUrlParam(key: string): string | null {
 }
 
 export function useUrlState() {
-  const [gebiet1Id, setGebiet1IdState] = useState<string | null>(() => getUrlParam('gebiet1'));
-  const [gebiet2Id, setGebiet2IdState] = useState<string | null>(() => {
+  const [gebiet1Name, setGebiet1NameState] = useState<string | null>(() => getUrlParam('gebiet1'));
+  const [gebiet2Name, setGebiet2NameState] = useState<string | null>(() => {
     const g1 = getUrlParam('gebiet1');
     const g2 = getUrlParam('gebiet2');
     return g1 && g1 === g2 ? null : g2;
@@ -22,8 +22,8 @@ export function useUrlState() {
     if (g1 && g1 === g2) {
       g2 = null;
     }
-    setGebiet1IdState(g1);
-    setGebiet2IdState(g2);
+    setGebiet1NameState(g1);
+    setGebiet2NameState(g2);
   };
 
   useEffect(() => {
@@ -49,15 +49,15 @@ export function useUrlState() {
     window.dispatchEvent(new Event(URL_CHANGE_EVENT));
   };
 
-  const setGebiet1Id = (id: string | null) => {
+  const setGebiet1Name = (name: string | null) => {
     const params = new URLSearchParams(window.location.search);
-    if (id === null) {
+    if (name === null) {
       params.delete('gebiet1');
       params.delete('gebiet2');
     } else {
-      params.set('gebiet1', id);
+      params.set('gebiet1', name);
       const currentG2 = params.get('gebiet2');
-      if (currentG2 === id) {
+      if (currentG2 === name) {
         params.delete('gebiet2');
       }
     }
@@ -68,12 +68,12 @@ export function useUrlState() {
     window.dispatchEvent(new Event(URL_CHANGE_EVENT));
   };
 
-  const setGebiet2Id = (id: string | null) => {
+  const setGebiet2Name = (name: string | null) => {
     const currentG1 = getUrlParam('gebiet1');
-    if (id !== null && currentG1 === id) {
+    if (name !== null && currentG1 === name) {
       return;
     }
-    updateParam('gebiet2', id);
+    updateParam('gebiet2', name);
   };
 
   const clearSelection = () => {
@@ -110,10 +110,10 @@ export function useUrlState() {
   };
 
   return {
-    gebiet1Id,
-    gebiet2Id,
-    setGebiet1Id,
-    setGebiet2Id,
+    gebiet1Name,
+    gebiet2Name,
+    setGebiet1Name,
+    setGebiet2Name,
     clearSelection,
     swapPositions,
   };
