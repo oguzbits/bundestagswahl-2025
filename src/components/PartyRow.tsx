@@ -12,7 +12,7 @@ export function PartyRow({ party, formatDeltaInfo }: PartyRowProps) {
   const partyColor = getPartyColor(party.parteiKurz);
 
   return (
-    <div className="group p-2.5 rounded-xl hover:bg-slate-50 transition-all border border-transparent hover:border-slate-100 flex flex-col space-y-1.5">
+    <div className="group p-2.5 rounded-xl transition-all border border-transparent flex flex-col space-y-1.5">
       {/* LINE 1 */}
       <div className="flex justify-between items-center">
         {/* Left: Colored dot + Party short name in bold */}
