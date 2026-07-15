@@ -394,11 +394,11 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
           <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 mt-4 px-4">
             <div className="flex items-center gap-2 text-xs font-semibold text-slate-700">
               <span className="h-3 w-3 shrink-0 rounded-[3px] bg-[#475569] block" />
-              <span>{name1}</span>
+              <span>{name1} (links)</span>
             </div>
             <div className="flex items-center gap-2 text-xs font-semibold text-slate-700">
               <span className="h-3 w-3 shrink-0 rounded-[3px] bg-[#cbd5e1] block" />
-              <span>{name2}</span>
+              <span>{name2} (rechts)</span>
             </div>
           </div>
         )}
