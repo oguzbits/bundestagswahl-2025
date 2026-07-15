@@ -315,7 +315,7 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
                     }
 
                     return (
-                      <div className="grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-800 pointer-events-none">
+                      <div className="grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-xs text-slate-800 pointer-events-none">
                         <p className="font-semibold text-slate-800 border-b border-slate-100 pb-1 mb-1">
                           {label}
                         </p>
@@ -371,7 +371,6 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
                 position={{ y: 10 }}
                 wrapperStyle={{
                   overflow: 'visible',
-                  filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.06))',
                 }}
               />
               {!compareWith ? null : <ChartLegend content={<ChartLegendContent />} />}
