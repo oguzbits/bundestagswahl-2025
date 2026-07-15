@@ -36,9 +36,9 @@ export function PartyRow({ party, formatDeltaInfo }: PartyRowProps) {
       </div>
 
       {/* LINE 2 */}
-      <div className="flex justify-between items-center text-xs text-slate-600">
+      <div className="flex justify-between items-start text-xs text-slate-600">
         {/* Left: Full official party name */}
-        <span className="truncate mr-4" title={party.parteiLang}>
+        <span className="whitespace-normal break-words mr-4" title={party.parteiLang}>
           {party.parteiLang}
         </span>
         {/* Right: Absolute votes formatted with thousands separators followed by the word "Stimmen" */}
