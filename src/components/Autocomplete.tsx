@@ -181,7 +181,7 @@ export function Autocomplete({
                         <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-900 text-white border border-slate-900 uppercase tracking-wider shrink-0">
                           Bund
                         </span>
-                        <span className="text-slate-900 font-bold truncate">{option.name}</span>
+                        <span className="text-slate-900 font-bold">{option.name}</span>
                       </span>
                       {selectedId === option.id && (
                         <Check className="h-4 w-4 text-indigo-600 shrink-0" />
@@ -212,7 +212,7 @@ export function Autocomplete({
                         <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-100 uppercase tracking-wider shrink-0">
                           Land
                         </span>
-                        <span className="text-slate-800 truncate">{option.name}</span>
+                        <span className="text-slate-800">{option.name}</span>
                       </span>
                       {selectedId === option.id && (
                         <Check className="h-4 w-4 text-indigo-600 shrink-0" />
@@ -244,12 +244,10 @@ export function Autocomplete({
                           <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200 uppercase tracking-wider shrink-0">
                             Wkr {option.id}
                           </span>
-                          <span className="text-slate-800 truncate font-semibold">
-                            {option.name}
-                          </span>
+                          <span className="text-slate-800 font-semibold">{option.name}</span>
                         </div>
                         {option.parentName && (
-                          <span className="text-xs text-slate-400 font-normal pl-1 truncate">
+                          <span className="text-xs text-slate-400 font-normal pl-1">
                             gehört zu {option.parentName}
                           </span>
                         )}
