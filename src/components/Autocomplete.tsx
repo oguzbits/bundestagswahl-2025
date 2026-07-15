@@ -72,7 +72,7 @@ export function Autocomplete({
               !selectedOption && 'text-slate-400',
             )}
           >
-            <span className="truncate flex-1 font-medium">
+            <span className="truncate flex-1 font-medium min-w-0">
               {selectedOption ? (
                 <span className="text-slate-900 flex items-center gap-2 min-w-0">
                   <span

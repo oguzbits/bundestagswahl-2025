@@ -1,12 +1,6 @@
 import { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Cell, LabelList } from 'recharts';
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartLegend,
-  ChartLegendContent,
-  type ChartConfig,
-} from './ui/chart';
+import { ChartContainer, ChartTooltip, type ChartConfig } from './ui/chart';
 import type { GebietErgebnis } from '../domain/types';
 import { getPartyColor } from '../domain/partyColors';
 import { formatFloorPercentage } from '../utils/dataTransformer';
@@ -246,17 +240,19 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
   return (
     <div className="bg-white rounded-2xl border border-slate-200 p-3 sm:p-6 shadow-sm space-y-4 sm:space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-100 pb-3 sm:pb-4">
-        <h3 className="text-lg font-bold text-slate-800 tracking-tight">{title}</h3>
+        <h3 className="text-sm xs:text-base sm:text-lg font-bold text-slate-800 tracking-tight">
+          {title}
+        </h3>
         <span className="text-xs text-slate-500 font-medium">Zweitstimmenanteil in %</span>
       </div>
 
       <div className="w-full relative">
-        <div className="h-[360px] sm:h-[420px] w-full relative" aria-hidden="true">
+        <div className="h-[460px] sm:h-[520px] w-full relative" aria-hidden="true">
           <ChartContainer config={chartConfig} className="h-full w-full aspect-auto">
             <BarChart
               key={isMobile ? 'mobile' : 'desktop'}
               data={chartItems}
-              margin={{ top: 20, right: 5, left: 0, bottom: 5 }}
+              margin={{ top: 20, right: 5, left: 0, bottom: isMobile ? 40 : 15 }}
               barGap={-6}
               barCategoryGap="12%"
             >
@@ -373,8 +369,6 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
                   overflow: 'visible',
                 }}
               />
-              {!compareWith ? null : <ChartLegend content={<ChartLegendContent />} />}
-
               {/* Primary region bar - rendered first */}
               <Bar name={name1} dataKey="percentage1" radius={[4, 4, 0, 0]} fill="#475569">
                 {chartItems.map((entry, index) => (
@@ -395,6 +389,19 @@ export function ElectionChart({ data, title, compareWith }: ElectionChartProps) 
             </BarChart>
           </ChartContainer>
         </div>
+        {/* Custom Legend outside the SVG container to prevent any overlap with rotated labels */}
+        {compareWith && (
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 mt-4 px-4">
+            <div className="flex items-center gap-2 text-xs font-semibold text-slate-700">
+              <span className="h-3 w-3 shrink-0 rounded-[3px] bg-[#475569] block" />
+              <span>{name1}</span>
+            </div>
+            <div className="flex items-center gap-2 text-xs font-semibold text-slate-700">
+              <span className="h-3 w-3 shrink-0 rounded-[3px] bg-[#cbd5e1] block" />
+              <span>{name2}</span>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Screen-reader accessible data table wrapped in a block container to prevent layout overflow */}

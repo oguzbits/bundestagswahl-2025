@@ -22,18 +22,18 @@ export function MetadatenHeader({ gebiet, parentName }: MetadataHeaderProps) {
       {/* Top Banner */}
       <div
         className={cn(
-          'px-6 py-5 text-white flex justify-between items-center',
+          'px-6 py-3 text-white flex justify-between items-center',
           gebiet.typ === 'Bund' && 'bg-slate-900',
           gebiet.typ === 'Land' && 'bg-indigo-900',
           gebiet.typ === 'Wahlkreis' && 'bg-slate-800',
         )}
       >
-        <div className="flex flex-col justify-center min-h-[76px]">
+        <div className="flex flex-col justify-center h-[68px] sm:h-[88px] w-full min-w-0">
           <span className="text-[10px] uppercase font-extrabold tracking-widest text-indigo-300 opacity-90 font-mono">
             {gebiet.typ}-Auswahl
           </span>
           <h3
-            className="text-xl sm:text-2xl font-black tracking-tight mt-0.5 truncate max-w-[240px] sm:max-w-xs md:max-w-sm"
+            className="text-[11px] xs:text-xs sm:text-sm md:text-base lg:text-lg font-black tracking-tight mt-0.5 leading-tight break-words"
             title={gebiet.name}
           >
             {gebiet.name}

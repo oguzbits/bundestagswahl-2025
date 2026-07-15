@@ -99,9 +99,9 @@ export default function App() {
                 </div>
 
                 {/* 2-Column Autocomplete Grid with swap button elegantly positioned in between */}
-                <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-4 items-end relative">
+                <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] gap-4 items-end relative">
                   {/* Column 1 Autocomplete */}
-                  <div className="w-full">
+                  <div className="w-full min-w-0">
                     <Autocomplete
                       options={
                         selectedGebiet2
@@ -137,7 +137,7 @@ export default function App() {
                   </div>
 
                   {/* Column 2 Autocomplete */}
-                  <div className="w-full">
+                  <div className="w-full min-w-0">
                     {gebiet1Name ? (
                       <Autocomplete
                         options={searchOptions.filter((opt) => opt.id !== selectedGebiet1?.id)}
@@ -147,7 +147,7 @@ export default function App() {
                           setGebiet2Name(name);
                         }}
                         placeholder="Vergleichsregion suchen..."
-                        label="Vergleichsregion (Optional)"
+                        label="Vergleichsregion"
                       />
                     ) : (
                       <div className="hidden md:block h-11" /> // spacer to keep track width 1fr

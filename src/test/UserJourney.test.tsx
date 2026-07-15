@@ -150,7 +150,7 @@ WKR_NR;WKR_NAME;LAND_NR;LAND_NAME;LAND_ABK
     expect(screen.getByRole('heading', { name: 'Bundesgebiet' })).toBeInTheDocument();
 
     // * The secondary comparison search field ("VERGLEICHSREGION") is now dynamically rendered in the DOM
-    const secondarySelect = screen.getByRole('combobox', { name: 'Vergleichsregion (Optional)' });
+    const secondarySelect = screen.getByRole('combobox', { name: 'Vergleichsregion' });
     expect(secondarySelect).toBeInTheDocument();
 
     // * The initial full-screen "Keine Wahlregion ausgewählt" empty state is replaced
