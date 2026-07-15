@@ -47,7 +47,7 @@ export function MetadatenHeader({ gebiet, parentName }: MetadataHeaderProps) {
       {/* Main Stats */}
       <div className="p-6 space-y-6">
         <div className="grid grid-cols-3 gap-1.5 xl:gap-3 text-center">
-          <div className="bg-slate-50 rounded-xl p-2 xl:p-3 border border-slate-100 flex flex-col justify-center min-w-0">
+          <div className="bg-slate-50 rounded-xl p-2 xl:p-3 border border-slate-100 flex flex-col justify-between min-w-0">
             <div className="text-[9px] xl:text-[10px] text-slate-500 font-bold uppercase tracking-wider leading-tight">
               <span className="hidden xl:inline">Wahlberechtigte</span>
               <span className="xl:hidden">
@@ -60,7 +60,7 @@ export function MetadatenHeader({ gebiet, parentName }: MetadataHeaderProps) {
               {gebiet.wahlberechtigte.toLocaleString('de-DE')}
             </div>
           </div>
-          <div className="bg-slate-50 rounded-xl p-2 xl:p-3 border border-slate-100 flex flex-col justify-center min-w-0">
+          <div className="bg-slate-50 rounded-xl p-2 xl:p-3 border border-slate-100 flex flex-col justify-between min-w-0">
             <div className="text-[9px] xl:text-[10px] text-slate-500 font-bold uppercase tracking-wider leading-tight">
               Wähler
             </div>
@@ -68,7 +68,7 @@ export function MetadatenHeader({ gebiet, parentName }: MetadataHeaderProps) {
               {gebiet.waehler.toLocaleString('de-DE')}
             </div>
           </div>
-          <div className="bg-indigo-50/50 rounded-xl p-2 xl:p-3 border border-indigo-100 flex flex-col justify-center min-w-0">
+          <div className="bg-indigo-50/50 rounded-xl p-2 xl:p-3 border border-indigo-100 flex flex-col justify-between min-w-0">
             <div className="text-[9px] xl:text-[10px] text-indigo-600 font-bold uppercase tracking-wider leading-tight">
               <span className="hidden xl:inline">Wahlbeteiligung</span>
               <span className="xl:hidden">
